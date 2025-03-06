@@ -211,32 +211,6 @@ if not existing_data.empty:
     # Most Common Appointment Type
     common_appt = existing_data["Appointment Type"].mode()[0] if not existing_data["Appointment Type"].isna().all() else "N/A"
 
-
-st.subheader("Clinic Metrics")
-
-if not existing_data.empty:
-    # Total Patients Recorded
-    total_patients = len(existing_data)
-
-    # Patients Seen Today
-    today_str = pd.Timestamp.today().strftime("%m/%d/%Y")
-    patients_today = len(existing_data[existing_data["Date"] == today_str])
-
-    # Average Time Spent in Clinic (Time Out - Registration Start)
-    existing_data["Registration Start"] = pd.to_datetime(existing_data["Registration Start"], errors="coerce")
-    existing_data["Time Out"] = pd.to_datetime(existing_data["Time Out"], errors="coerce")
-    existing_data["Total Time"] = (existing_data["Time Out"] - existing_data["Registration Start"]).dt.total_seconds() / 60  # Convert to minutes
-    avg_time_spent = existing_data["Total Time"].mean()
-
-    # Average Doctor Consultation Time (Doctor Out - Doctor In)
-    existing_data["Doctor In"] = pd.to_datetime(existing_data["Doctor In"], errors="coerce")
-    existing_data["Doctor Out"] = pd.to_datetime(existing_data["Doctor Out"], errors="coerce")
-    existing_data["Doctor Time"] = (existing_data["Doctor Out"] - existing_data["Doctor In"]).dt.total_seconds() / 60  # Convert to minutes
-    avg_doctor_time = existing_data["Doctor Time"].mean()
-
-    # Most Common Appointment Type
-    common_appt = existing_data["Appointment Type"].mode()[0] if not existing_data["Appointment Type"].isna().all() else "N/A"
-
     # Display Metrics with Smaller Font
     col1, col2, col3 = st.columns(3)
 
