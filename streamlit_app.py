@@ -243,9 +243,9 @@ else:
 
 import matplotlib.pyplot as plt
 
-
-st.subheader("📊 Clinic Data Insights")
 st.divider()
+st.subheader("📊 Clinic Data Insights")
+
 
 # Get today's date in the correct format
 today_str = pd.Timestamp.today().strftime("%m/%d/%Y")
