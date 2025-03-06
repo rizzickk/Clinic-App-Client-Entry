@@ -1,9 +1,7 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
-import matplotlib.pyplot as plt
-import pandas as pd
-import streamlit as st
+
 
 
 # Establish Google Sheets connection
@@ -243,8 +241,12 @@ if not existing_data.empty:
 else:
     st.warning("No data available for metrics.")
 
+import matplotlib.pyplot as plt
+
+
 st.subheader("📊 Clinic Data Insights")
 st.divider()
+
 # Get today's date in the correct format
 today_str = pd.Timestamp.today().strftime("%m/%d/%Y")
 
@@ -256,25 +258,20 @@ patients_per_doctor = patients_today_df["Staff"].value_counts()
 
 st.subheader("Patients Seen per Doctor Today")
 
-if not patients_today_df.empty:
+if not patients_today_df.empty and not patients_per_doctor.empty:
+    # Option 1: Simple Bar Chart using Streamlit
     st.bar_chart(patients_per_doctor)
-else:
-    st.warning("No patients seen today.")
 
-    import matplotlib.pyplot as plt
-
-st.subheader("Patients Seen per Doctor Today")
-
-if not patients_today_df.empty:
+    # Option 2: Matplotlib Chart with Custom Styling
     fig, ax = plt.subplots(figsize=(8, 5))
     patients_per_doctor.plot(kind="bar", ax=ax, color="royalblue")
+    
     ax.set_title("Number of Patients Seen by Doctor Today")
     ax.set_xlabel("Doctor")
     ax.set_ylabel("Number of Patients")
     ax.set_xticklabels(patients_per_doctor.index, rotation=45, ha="right")
-    
+
     st.pyplot(fig)
+
 else:
     st.warning("No patients seen today.")
-
-    
