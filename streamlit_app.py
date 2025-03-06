@@ -130,12 +130,28 @@ elif option == "Edit Patient":
             update_button = st.form_submit_button(label="Update Patient")
 
             if update_button:
-                existing_data.loc[existing_data["ID"] == selected_id, :] = [
-                    date.strftime("%m/%d/%Y"), staff, room, selected_id, appointment_type,
-                    registration_start.strftime('%H:%M'), registration_end.strftime('%H:%M'),
-                    triage_start.strftime('%H:%M'), triage_end.strftime('%H:%M'),
-                    time_roomed.strftime('%H:%M'), exam_end.strftime('%H:%M')
-                ]
+                # Ensure selected_id exists in the DataFrame before modifying
+                if not existing_data[existing_data["ID"] == selected_id].empty:
+                    existing_data.loc[existing_data["ID"] == selected_id, "Date"] = date.strftime("%m/%d/%Y")
+                    existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
+                    existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
+                    existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
+                    existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Triage End"] = triage_end.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Time Roomed"] = time_roomed.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Exam End"] = exam_end.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Doctor In"] = doctor_in.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Doctor Out"] = doctor_out.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Lab Start"] = lab_start.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Lab End"] = lab_end.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "SW Start"] = sw_start.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "SW End"] = sw_end.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Time Out"] = time_out.strftime('%H:%M')
 
-                conn.update(data=existing_data)
-                st.success("Patient information updated successfully!")
+                    # Update the Google Sheets data
+                    conn.update(data=existing_data)
+                    st.success("Patient information updated successfully!")
+                else:
+                    st.error("Error: Patient ID not found. Please try again.")
