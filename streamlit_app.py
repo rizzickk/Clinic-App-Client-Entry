@@ -87,7 +87,11 @@ if option == "New Patient":
                 "Time Out": [time_out.strftime('%H:%M')]
             })
 
-            updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
+            if existing_data.empty:
+                updated_data = new_entry
+            else:
+                updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
+            
             conn.update(data=updated_data)
 
             st.success("Patient added successfully!")
