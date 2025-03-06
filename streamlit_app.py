@@ -129,10 +129,10 @@ elif option == "Edit Patient":
     if selected_id and patient_data:
         with st.form("edit_patient_form"):
             date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"]))
-            staff_value = str(patient_data["Staff"]).strip() if "Staff" in patient_data and patient_data["Staff"] else DOCTORS[0]
+            staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
-            room_value = str(patient_data["Room"]) if "Room" in patient_data and patient_data["Room"] is not None else ROOMS[0]
+            room_value = str(patient_data.get["Room", ""]).strip() if patient_data.get("Room") else ROOMS[0]
             room_index = ROOMS.index(room_value) if room_value in ROOMS else 0  # Default to index 0 if not found
             room = st.selectbox("Room", options=ROOMS, index=room_index)
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
