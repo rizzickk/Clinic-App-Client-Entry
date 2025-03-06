@@ -1,6 +1,10 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
+import matplotlib.pyplot as plt
+import pandas as pd
+import streamlit as st
+
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
