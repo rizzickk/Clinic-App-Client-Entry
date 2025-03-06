@@ -2,69 +2,96 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
-#Display Title and Description
+# Establish Google Sheets connection
+conn = st.connection("gsheets", type=GSheetsConnection)
+existing_data = conn.read()
+
+# Display Title and Description
 st.title("Client Tracker")
 st.markdown("This is a simple Client Management System that allows you to input data.")
 
-#Establish connection to Google Sheets
-conn = st.connection("gsheets", type = GSheetsConnection)
-
-#Fetch existing data
-existing_data = conn.read(worksheet = "Sheet1", usecols = list(range(8)), ttl = 5)
-existing_data = existing_data.dropna(how = "all")
-
-#List of doctors, patient types, and appointment types
+# Updated Staff list
 DOCTORS = [
     "Dr. Jon Pierson",
     "Dr. Javier De La Torre",
-    "Dr. Chinyere Mbagwu",
-    "Dr. Richard McCallum"
+    "Dr. John Borrego",
+    "Dr. Omer Usman",
+    "Dr. Abhinav Vulisha",
+    "Dr. Muhammad Tahir",
+    "Dr. Richard McCallum",
+    "Dr. Eric Cox",
+    "Dr. Sandra Vexler",
+    "Dr. Abdel Vexler"
 ]
 
-ROOM = [
-    "100",
-    "101",
-    "102",
-    "103"
+# Room options
+ROOMS = ["100", "101", "102", "103"]
+
+# Updated Appointment Types
+APPT_TYPES = [
+    "New Patient", 
+    "New Encounter (existing pt.)", 
+    "Follow-up", 
+    "Lab Draw", 
+    "Lab Results", 
+    "Rx Refill", 
+    "Specialist", 
+    "Specialist Follow Up", 
+    "Other"
 ]
 
-APPOINTMENT_TYPE = [
-    "COVID",
-    "General",
-    "LAB"
-]
-
-PATIENT_TYPE = [
-    "NEW",
-    "FP"
-]
-
-with st.form(key = "add_client"):
-    #Input fields
+# Form for user input
+with st.form("client_tracker_form"):
     date = st.date_input("Date")
-    staff = st.selectbox("Staff", options = DOCTORS, index = None)
-    room = st.selectbox("Room", options = ROOM, index = None)
-    id_ = st.number_input("ID", min_value = 0, max_value = 1000000)
-    patient_type = st.selectbox("Patient Type", options = PATIENT_TYPE, index = None)   
-    appointment_type = st.selectbox("Appointment Type", options = APPOINTMENT_TYPE, index = None)   
-    registration_begin = st.time_input("Registration Begin Time")
-    registration_end = st.time_input("Time Out")
+    staff = st.selectbox("Staff", options=DOCTORS, index=None)
+    room = st.selectbox("Room", options=ROOMS, index=None)
+    id_ = st.number_input("ID", min_value=0, max_value=1000000)
 
-    submit_button = st.form_submit_button(label = "Add Client")
+    # Appointment Type selection with editable option for "Other"
+    appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None)
+    if appointment_type == "Other":
+        appointment_type = st.text_input("Specify Other Appointment Type")
+
+    # Time fields
+    registration_start = st.time_input("Registration Start")
+    registration_end = st.time_input("Registration End")
+    triage_start = st.time_input("Triage Start")
+    triage_end = st.time_input("Triage End")
+    time_roomed = st.time_input("Time Roomed")
+    exam_end = st.time_input("Exam End")
+    doctor_in = st.time_input("Doctor In")
+    doctor_out = st.time_input("Doctor Out")
+    lab_start = st.time_input("Lab Start")
+    lab_end = st.time_input("Lab End")
+    sw_start = st.time_input("SW Start")
+    sw_end = st.time_input("SW End")
+    time_out = st.time_input("Time Out")
+
+    submit_button = st.form_submit_button(label="Add Client")
 
     if submit_button:
-        add_client = pd.DataFrame({
-            "Date": [date],
+        new_entry = pd.DataFrame({
+            "Date": [date.strftime("%m/%d/%Y")],
             "Staff": [staff],
             "Room": [room],
             "ID": [id_],
-            "Patient Type": [patient_type],
             "Appointment Type": [appointment_type],
-            "Registration Begin Time": [registration_begin],
-            "Time Out": [registration_end]
+            "Registration Start": [registration_start.strftime('%H:%M')],
+            "Registration End": [registration_end.strftime("%H:%M")],
+            "Triage Start": [triage_start.strftime('%H:%M')],
+            "Triage End": [triage_end.strftime('%H:%M')],
+            "Time Roomed": [time_roomed.strftime('%H:%M')],
+            "Exam End": [exam_end.strftime('%H:%M')],
+            "Doctor In": [doctor_in.strftime('%H:%M')],
+            "Doctor Out": [doctor_out.strftime('%H:%M')],
+            "Lab Start": [lab_start.strftime('%H:%M')],
+            "Lab End": [lab_end.strftime('%H:%M')],
+            "SW Start": [sw_start.strftime('%H:%M')],
+            "SW End": [sw_end.strftime('%H:%M')],
+            "Time Out": [time_out.strftime('%H:%M')]
         })
 
-        existing_data = pd.concat([existing_data, add_client], ignore_index = True)
-        conn.update(worksheet = "Sheet1", data = existing_data)
+        updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
+        conn.update(data=updated_data)
 
         st.success("Client added successfully!")
