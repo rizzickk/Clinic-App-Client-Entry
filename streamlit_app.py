@@ -211,25 +211,56 @@ if not existing_data.empty:
     # Most Common Appointment Type
     common_appt = existing_data["Appointment Type"].mode()[0] if not existing_data["Appointment Type"].isna().all() else "N/A"
 
-    # Display Metrics
+
+st.subheader("Clinic Metrics")
+
+if not existing_data.empty:
+    # Total Patients Recorded
+    total_patients = len(existing_data)
+
+    # Patients Seen Today
+    today_str = pd.Timestamp.today().strftime("%m/%d/%Y")
+    patients_today = len(existing_data[existing_data["Date"] == today_str])
+
+    # Average Time Spent in Clinic (Time Out - Registration Start)
+    existing_data["Registration Start"] = pd.to_datetime(existing_data["Registration Start"], errors="coerce")
+    existing_data["Time Out"] = pd.to_datetime(existing_data["Time Out"], errors="coerce")
+    existing_data["Total Time"] = (existing_data["Time Out"] - existing_data["Registration Start"]).dt.total_seconds() / 60  # Convert to minutes
+    avg_time_spent = existing_data["Total Time"].mean()
+
+    # Average Doctor Consultation Time (Doctor Out - Doctor In)
+    existing_data["Doctor In"] = pd.to_datetime(existing_data["Doctor In"], errors="coerce")
+    existing_data["Doctor Out"] = pd.to_datetime(existing_data["Doctor Out"], errors="coerce")
+    existing_data["Doctor Time"] = (existing_data["Doctor Out"] - existing_data["Doctor In"]).dt.total_seconds() / 60  # Convert to minutes
+    avg_doctor_time = existing_data["Doctor Time"].mean()
+
+    # Most Common Appointment Type
+    common_appt = existing_data["Appointment Type"].mode()[0] if not existing_data["Appointment Type"].isna().all() else "N/A"
+
+    # Display Metrics with Smaller Font
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric("Total Patients", total_patients)
+        st.markdown(f'<p style="font-size:16px; font-weight:bold;">Total Patients</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:14px;">{total_patients}</p>', unsafe_allow_html=True)
 
     with col2:
-        st.metric("Patients Seen Today", patients_today)
+        st.markdown(f'<p style="font-size:16px; font-weight:bold;">Patients Seen Today</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:14px;">{patients_today}</p>', unsafe_allow_html=True)
 
     with col3:
-        st.metric("Avg Time in Clinic (mins)", f"{avg_time_spent:.1f}" if not pd.isna(avg_time_spent) else "N/A")
+        st.markdown(f'<p style="font-size:16px; font-weight:bold;">Avg Time in Clinic (mins)</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:14px;">{avg_time_spent:.1f if not pd.isna(avg_time_spent) else "N/A"}</p>', unsafe_allow_html=True)
 
     col4, col5 = st.columns(2)
 
     with col4:
-        st.metric("Avg Doctor Time (mins)", f"{avg_doctor_time:.1f}" if not pd.isna(avg_doctor_time) else "N/A")
+        st.markdown(f'<p style="font-size:16px; font-weight:bold;">Avg Doctor Time (mins)</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:14px;">{avg_doctor_time:.1f if not pd.isna(avg_doctor_time) else "N/A"}</p>', unsafe_allow_html=True)
 
     with col5:
-        st.metric("Most Common Appointment", common_appt)
+        st.markdown(f'<p style="font-size:16px; font-weight:bold;">Most Common Appointment</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:14px;">{common_appt}</p>', unsafe_allow_html=True)
 
 else:
     st.warning("No data available for metrics.")
