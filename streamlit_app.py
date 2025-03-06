@@ -128,6 +128,13 @@ elif option == "Edit Patient":
             triage_end = st.time_input("Triage End", value=pd.to_datetime(patient_data["Triage End"]).time())
             time_roomed = st.time_input("Time Roomed", value=pd.to_datetime(patient_data["Time Roomed"]).time())
             exam_end = st.time_input("Exam End", value=pd.to_datetime(patient_data["Exam End"]).time())
+            doctor_in = st.time_input("Doctor In", value=pd.to_datetime(patient_data["Doctor In"]).time())
+            doctor_out = st.time_input("Doctor Out", value=pd.to_datetime(patient_data["Doctor Out"]).time())
+            lab_start = st.time_input("Lab Start", value=pd.to_datetime(patient_data["Lab Start"]).time())
+            lab_end = st.time_input("Lab End", value=pd.to_datetime(patient_data["Lab End"]).time())
+            sw_start = st.time_input("SW Start", value=pd.to_datetime(patient_data["SW Start"]).time())
+            sw_end = st.time_input("SW End", value=pd.to_datetime(patient_data["SW End"]).time())
+            time_out = st.time_input("Time Out", value=pd.to_datetime(patient_data["Time Out"]).time())
 
             update_button = st.form_submit_button(label="Update Patient")
 
@@ -138,19 +145,19 @@ elif option == "Edit Patient":
                     existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
                     existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
-                    existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Triage End"] = triage_end.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Time Roomed"] = time_roomed.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Exam End"] = exam_end.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Doctor In"] = doctor_in.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Doctor Out"] = doctor_out.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Lab Start"] = lab_start.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Lab End"] = lab_end.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "SW Start"] = sw_start.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "SW End"] = sw_end.strftime('%H:%M')
-                    existing_data.loc[existing_data["ID"] == selected_id, "Time Out"] = time_out.strftime('%H:%M')
+                    existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M') if registration_end else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M') if triage_start else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Triage End"] = triage_end.strftime('%H:%M') if triage_end else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Time Roomed"] = time_roomed.strftime('%H:%M') if time_roomed else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Exam End"] = exam_end.strftime('%H:%M') if exam_end else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Doctor In"] = doctor_in.strftime('%H:%M') if doctor_in else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Doctor Out"] = doctor_out.strftime('%H:%M') if doctor_out else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Lab Start"] = lab_start.strftime('%H:%M') if lab_start else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Lab End"] = lab_end.strftime('%H:%M') if lab_end else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "SW Start"] = sw_start.strftime('%H:%M') if sw_start else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "SW End"] = sw_end.strftime('%H:%M') if sw_end else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Time Out"] = time_out.strftime('%H:%M') if time_out else None
 
                     # Update the Google Sheets data
                     conn.update(data=existing_data)
