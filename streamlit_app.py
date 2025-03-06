@@ -118,7 +118,7 @@ elif option == "Edit Patient":
             st.dataframe(existing_data)
     else:
         st.warning("No data available yet.")
-        
+
     if selected_id:
         patient_data = get_patient_data(selected_id)
         if patient_data:
@@ -129,30 +129,34 @@ elif option == "Edit Patient":
     if selected_id and patient_data:
         with st.form("edit_patient_form"):
             date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"]))
-            staff = st.selectbox("Staff", options=DOCTORS, index=DOCTORS.index(patient_data["Staff"]))
+            staff_value = str(patient_data["Staff"]).strip() if "Staff" in patient_data and patient_data["Staff"] else DOCTORS[0]
+            staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
+            staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
             room_value = str(patient_data["Room"]) if "Room" in patient_data and patient_data["Room"] is not None else ROOMS[0]
             room_index = ROOMS.index(room_value) if room_value in ROOMS else 0  # Default to index 0 if not found
             room = st.selectbox("Room", options=ROOMS, index=room_index)
-            appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=APPT_TYPES.index(patient_data["Appointment Type"]) if patient_data["Appointment Type"] in APPT_TYPES else len(APPT_TYPES)-1)
+            appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
+            appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
+            appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
 
             if appointment_type == "Other":
                 appointment_type = st.text_input("Specify Other Appointment Type", value=patient_data["Appointment Type"])
 
             # Time fields pre-filled
-            registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time())
-            registration_end = st.time_input("Registration End", value=pd.to_datetime(patient_data["Registration End"]).time())
-            triage_start = st.time_input("Triage Start", value=pd.to_datetime(patient_data["Triage Start"]).time())
-            triage_end = st.time_input("Triage End", value=pd.to_datetime(patient_data["Triage End"]).time())
-            time_roomed = st.time_input("Time Roomed", value=pd.to_datetime(patient_data["Time Roomed"]).time())
-            exam_end = st.time_input("Exam End", value=pd.to_datetime(patient_data["Exam End"]).time())
-            doctor_in = st.time_input("Doctor In", value=pd.to_datetime(patient_data["Doctor In"]).time())
-            doctor_out = st.time_input("Doctor Out", value=pd.to_datetime(patient_data["Doctor Out"]).time())
-            lab_start = st.time_input("Lab Start", value=pd.to_datetime(patient_data["Lab Start"]).time())
-            lab_end = st.time_input("Lab End", value=pd.to_datetime(patient_data["Lab End"]).time())
-            sw_start = st.time_input("SW Start", value=pd.to_datetime(patient_data["SW Start"]).time())
-            sw_end = st.time_input("SW End", value=pd.to_datetime(patient_data["SW End"]).time())
-            time_out = st.time_input("Time Out", value=pd.to_datetime(patient_data["Time Out"]).time())
-
+            registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None)
+            registration_end = st.time_input("Registration End", value=pd.to_datetime(patient_data["Registration End"]).time() if patient_data["Registration End"] else None)
+            triage_start = st.time_input("Triage Start", value=pd.to_datetime(patient_data["Triage Start"]).time() if patient_data["Triage Start"] else None)
+            triage_end = st.time_input("Triage End", value=pd.to_datetime(patient_data["Triage End"]).time() if patient_data["Triage End"] else None)
+            time_roomed = st.time_input("Time Roomed", value=pd.to_datetime(patient_data["Time Roomed"]).time() if patient_data["Time Roomed"] else None)
+            exam_end = st.time_input("Exam End", value=pd.to_datetime(patient_data["Exam End"]).time() if patient_data["Exam End"] else None)
+            doctor_in = st.time_input("Doctor In", value=pd.to_datetime(patient_data["Doctor In"]).time() if patient_data["Doctor In"] else None)
+            doctor_out = st.time_input("Doctor Out", value=pd.to_datetime(patient_data["Doctor Out"]).time() if patient_data["Doctor Out"] else None)
+            lab_start = st.time_input("Lab Start", value=pd.to_datetime(patient_data["Lab Start"]).time() if patient_data["Lab Start"] else None)
+            lab_end = st.time_input("Lab End", value=pd.to_datetime(patient_data["Lab End"]).time() if patient_data["Lab End"] else None)
+            sw_start = st.time_input("SW Start", value=pd.to_datetime(patient_data["SW Start"]).time() if patient_data["SW Start"] else None)
+            sw_end = st.time_input("SW End", value=pd.to_datetime(patient_data["SW End"]).time() if patient_data["SW End"] else None)
+            time_out = st.time_input("Time Out", value=pd.to_datetime(patient_data["Time Out"]).time() if patient_data["Time Out"] else None)
+                        
             update_button = st.form_submit_button(label="Update Patient")
 
             if update_button:
