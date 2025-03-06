@@ -250,7 +250,7 @@ if not existing_data.empty:
 
     with col3:
         st.markdown(f'<p style="font-size:16px; font-weight:bold;">Avg Time in Clinic (mins)</p>', unsafe_allow_html=True)
-        st.markdown(f'<p style="font-size:14px;">{avg_time_spent:.1f if not pd.isna(avg_time_spent) else "N/A"}</p>', unsafe_allow_html=True)
+        st.markdown(f'<p style="font-size:14px;">{"{:.1f}".format(avg_time_spent) if not pd.isna(avg_time_spent) else "N/A"}</p>', unsafe_allow_html=True)
 
     col4, col5 = st.columns(2)
 
