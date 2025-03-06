@@ -38,6 +38,15 @@ def get_patient_data(patient_id):
 # ---- NEW PATIENT FORM ----
 if option == "New Patient":
     st.subheader("New Patient Entry")
+
+    # Toggle to view existing data
+    if not existing_data.empty:
+        show_table = st.checkbox("Show Existing Patient Data", value=False)
+        if show_table:
+            st.dataframe(existing_data)
+    else:
+        st.warning("No data available yet.")
+
     with st.form("new_patient_form"):
         date = st.date_input("Date")
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
@@ -102,6 +111,14 @@ elif option == "Edit Patient":
 
     selected_id = st.number_input("Enter Patient ID to Edit", min_value=0, max_value=1000000, step=1)
     
+    # Toggle to view existing data
+    if not existing_data.empty:
+        show_table = st.checkbox("Show Existing Patient Data", value=False)
+        if show_table:
+            st.dataframe(existing_data)
+    else:
+        st.warning("No data available yet.")
+        
     if selected_id:
         patient_data = get_patient_data(selected_id)
         if patient_data:
