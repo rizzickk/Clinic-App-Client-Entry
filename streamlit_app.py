@@ -238,3 +238,39 @@ if not existing_data.empty:
 
 else:
     st.warning("No data available for metrics.")
+
+st.subheader("📊 Clinic Data Insights")
+st.divider()
+# Get today's date in the correct format
+today_str = pd.Timestamp.today().strftime("%m/%d/%Y")
+
+# Filter data for today's appointments
+patients_today_df = existing_data[existing_data["Date"] == today_str]
+
+# Count the number of patients seen per doctor
+patients_per_doctor = patients_today_df["Staff"].value_counts()
+
+st.subheader("Patients Seen per Doctor Today")
+
+if not patients_today_df.empty:
+    st.bar_chart(patients_per_doctor)
+else:
+    st.warning("No patients seen today.")
+
+    import matplotlib.pyplot as plt
+
+st.subheader("Patients Seen per Doctor Today")
+
+if not patients_today_df.empty:
+    fig, ax = plt.subplots(figsize=(8, 5))
+    patients_per_doctor.plot(kind="bar", ax=ax, color="royalblue")
+    ax.set_title("Number of Patients Seen by Doctor Today")
+    ax.set_xlabel("Doctor")
+    ax.set_ylabel("Number of Patients")
+    ax.set_xticklabels(patients_per_doctor.index, rotation=45, ha="right")
+    
+    st.pyplot(fig)
+else:
+    st.warning("No patients seen today.")
+
+    
