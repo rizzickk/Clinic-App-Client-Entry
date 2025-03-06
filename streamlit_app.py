@@ -262,16 +262,6 @@ if not patients_today_df.empty and not patients_per_doctor.empty:
     # Option 1: Simple Bar Chart using Streamlit
     st.bar_chart(patients_per_doctor)
 
-    # Option 2: Matplotlib Chart with Custom Styling
-    fig, ax = plt.subplots(figsize=(8, 5))
-    patients_per_doctor.plot(kind="bar", ax=ax, color="royalblue")
-    
-    ax.set_title("Number of Patients Seen by Doctor Today")
-    ax.set_xlabel("Doctor")
-    ax.set_ylabel("Number of Patients")
-    ax.set_xticklabels(patients_per_doctor.index, rotation=45, ha="right")
-
-    st.pyplot(fig)
-
+  
 else:
     st.warning("No patients seen today.")
