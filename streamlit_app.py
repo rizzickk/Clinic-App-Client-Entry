@@ -4,7 +4,7 @@ import pandas as pd
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
-existing_data = conn.read()
+existing_data = conn.read(ttl=0)
 
 # Display Title
 st.title("Client Tracker")
