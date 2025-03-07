@@ -2,3 +2,4 @@ streamlit
 St-gsheets-connection
 matplotlib
 datetime
+pytz
