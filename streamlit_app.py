@@ -152,7 +152,7 @@ elif option == "Edit Patient":
                     room_value = ROOMS[0]  # Fallback in case of conversion error
             else:
                 room_value = ROOMS[0]  # Default if 'Room' is missing or empty
-                    room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
+            room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
             room = st.selectbox("Room", options=ROOMS, index=room_index)
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
             appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
