@@ -50,7 +50,8 @@ if option == "New Patient":
         st.warning("No data available yet.")
 
     with st.form("new_patient_form"):
-        date = st.date_input("Date")
+        today_str = datetime.today().strftime("%m/%d/%Y")
+        date = st.date_input("Date", pd.to_datetime(today_str))
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
