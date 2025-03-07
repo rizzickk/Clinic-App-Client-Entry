@@ -182,10 +182,10 @@ elif option == "Edit Patient":
             if update_button:
                 # Ensure selected_id exists in the DataFrame before modifying
                 if not existing_data[existing_data["ID"] == selected_id].empty:
-                    existing_data.loc[existing_data["ID"] == selected_id, "Date"] = date.strftime("%m/%d/%Y")
-                    existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
-                    existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
-                    existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
+                    existing_data.loc[existing_data["ID"] == selected_id, "Date"] = date.strftime("%m/%d/%Y") if pd.notna(date) else ""
+                    existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff if pd.notna(staff) else ""
+                    existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room if pd.notna(room) else ""
+                    existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = "Describe Appointment Type If Applicable"] = appointment_type_other if pd.notna(appointment_type_other) else ""
 
                     existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
