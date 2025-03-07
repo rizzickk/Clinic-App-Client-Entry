@@ -176,7 +176,7 @@ elif option == "Edit Patient":
                     existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
                     existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
-                    existing_data.at[existing_data.index[existing_data["ID"] == selected_id][0], "Describe Appointment Type If Applicable"] = appointment_type_other
+                    existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M') if registration_end else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M') if triage_start else None
@@ -223,7 +223,7 @@ if not existing_data.empty:
     common_appt = existing_data["Appointment Type"].mode()[0] if not existing_data["Appointment Type"].isna().all() else "N/A"
 
     # Display Metrics with Smaller Font
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3) 
 
     with col1:
         st.markdown(f'<p style="font-size:16px; font-weight:bold;">Total Patients</p>', unsafe_allow_html=True)
