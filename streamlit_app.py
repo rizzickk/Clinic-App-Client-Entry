@@ -187,6 +187,7 @@ elif option == "Edit Patient":
 
                     # Now set st.text_input with this existing value
                     appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_value)
+                    existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M') if registration_end else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M') if triage_start else None
