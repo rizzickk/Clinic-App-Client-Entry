@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
-import pytz
+
 
 
 
@@ -38,8 +38,14 @@ def get_patient_data(patient_id):
         return existing_data.loc[existing_data["ID"] == patient_id].to_dict(orient="records")[0]
     return None
 
-local_tz = pytz.timezone("America/Denver")
-today_local = datetime.now(pytz.utc).astimezone(local_tz).date()
+from datetime import datetime, timezone, timedelta
+
+# Define the UTC offset for Mountain Time (MST/MDT)
+MOUNTAIN_TIME_OFFSET = timedelta(hours=-7)  # MST is UTC-7, MDT is UTC-6
+
+# Get today's date in Mountain Time
+today_local = datetime.now(timezone.utc) + MOUNTAIN_TIME_OFFSET
+today_local = today_local.date()  # Extract only the date
 
 # ---- NEW PATIENT FORM ----
 if option == "New Patient":
