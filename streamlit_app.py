@@ -217,7 +217,7 @@ elif option == "Edit Patient":
                         time_out.strftime('%H:%M') if time_out else None
                     ]
                     st.success("Patient information updated successfully!")
-                    conn.update(data=updated_data)
+                conn.update(data=updated_data)
 
                 else:
                     # Create a new entry instead of updating
@@ -246,7 +246,7 @@ elif option == "Edit Patient":
                     # Append to existing data
                     updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
                     st.success("New patient entry added successfully!")
-                    conn.update(data=updated_data)
+                conn.update(data=updated_data)
 
 
 
