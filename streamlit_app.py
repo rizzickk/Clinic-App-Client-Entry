@@ -144,13 +144,21 @@ elif option == "Edit Patient":
             staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
-            room_value = str(int(patient_data["Room"])) if str(patient_data.get("Room", "")).isdigit() else ROOMS[0]
-            room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
+            # Ensure 'Room' is properly extracted and converted
+            if "Room" in patient_data and not patient_data["Room"].isna().all():
+                try:
+                    room_value = str(int(float(patient_data["Room"].dropna().iloc[0])))  # Handle int and float values
+                except ValueError:
+                    room_value = ROOMS[0]  # Fallback in case of conversion error
+            else:
+                room_value = ROOMS[0]  # Default if 'Room' is missing or empty
+                    room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
             room = st.selectbox("Room", options=ROOMS, index=room_index)
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
             appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
             appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
-                        # Fetch existing appointment type if it exists
+            
+            # Fetch existing appointment type if it exists
             existing_value = existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"]
 
             # Ensure it's a valid value (avoid NaN issues)
@@ -184,16 +192,9 @@ elif option == "Edit Patient":
                 if not existing_data[existing_data["ID"] == selected_id].empty:
                     existing_data.loc[existing_data["ID"] == selected_id, "Date"] = date.strftime("%m/%d/%Y") if pd.notna(date) else ""
                     existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff if pd.notna(staff) else ""
-                    # Ensure 'Room' is properly extracted and converted
-                    if "Room" in patient_data and not patient_data["Room"].isna().all():
-                        try:
-                            room_value = str(int(float(patient_data["Room"].dropna().iloc[0])))  # Handle int and float values
-                        except ValueError:
-                            room_value = ROOMS[0]  # Fallback in case of conversion error
-                    else:
-                        room_value = ROOMS[0]  # Default if 'Room' is missing or empty
 
 
+                    existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room if pd.notna(room) else ""
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type if pd.notna(appointment_type) else ""
 
                     existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other if pd.notna(appointment_type_other) else ""
