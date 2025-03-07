@@ -247,7 +247,7 @@ elif option == "Edit Patient":
                     st.success("New patient entry added successfully!")
 
                     # Update database or Google Sheets
-                conn.update(data=updated_data)
+            conn.update(data=updated_data)
 
 
 st.subheader("Clinic Metrics")
