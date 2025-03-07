@@ -216,8 +216,15 @@ elif option == "Edit Patient":
                         sw_end.strftime('%H:%M') if sw_end else None,
                         time_out.strftime('%H:%M') if time_out else None
                     ]
+
+                    if existing_data.empty:
+                        updated_data = new_entry
+                    else:
+                        updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
+                    
+                    conn.update(data=updated_data)
                     st.success("Patient information updated successfully!")
-                conn.update(data=updated_data)
+
 
                 else:
                     # Create a new entry instead of updating
@@ -244,9 +251,13 @@ elif option == "Edit Patient":
                     })
 
                     # Append to existing data
-                    updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
-                    st.success("New patient entry added successfully!")
-                conn.update(data=updated_data)
+                    if existing_data.empty:
+                        updated_data = new_entry
+                    else:
+                        updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
+                    
+                    conn.update(data=updated_data)
+                    st.success("Patient information updated successfully!")
 
 
 
