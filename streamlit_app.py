@@ -247,10 +247,8 @@ elif option == "Edit Patient":
                     st.success("New patient entry added successfully!")
 
                     # Update database or Google Sheets
-                    conn.update(data=updated_data)
-                    st.success("Patient information updated successfully!")
-                else:
-                    st.error("Error: Patient ID not found. Please try again.")
+                conn.update(data=updated_data)
+
 
 st.subheader("Clinic Metrics")
 
