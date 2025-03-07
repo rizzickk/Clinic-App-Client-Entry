@@ -193,7 +193,7 @@ elif option == "Edit Patient":
                     else:
                         room_value = ROOMS[0]  # Default if 'Room' is missing or empty
 
-                    existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room_value
+
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type if pd.notna(appointment_type) else ""
 
                     existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other if pd.notna(appointment_type_other) else ""
