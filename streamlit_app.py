@@ -4,6 +4,7 @@ import pandas as pd
 
 
 
+
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
 existing_data = conn.read(ttl=0)
@@ -50,6 +51,7 @@ if option == "New Patient":
         st.warning("No data available yet.")
 
     with st.form("new_patient_form"):
+        from datetime import datetime
         today_str = datetime.today().strftime("%m/%d/%Y")
         date = st.date_input("Date", pd.to_datetime(today_str))
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
