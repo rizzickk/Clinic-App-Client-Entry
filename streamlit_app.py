@@ -218,6 +218,7 @@ elif option == "Edit Patient":
                     ]
                     
                     updated_data = existing_data
+                    conn.update(data=updated_data)
                     st.success("Patient information updated successfully!")
 
 
