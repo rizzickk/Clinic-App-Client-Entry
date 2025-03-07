@@ -150,7 +150,7 @@ elif option == "Edit Patient":
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
             appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
             appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
-            appointment_type_other = st.text_input("Describe Appointment Type if Applicable")
+            appointment_type_other = st.text_input("Describe Appointment Type If Applicable")
 
             # Time fields pre-filled
             registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None)
