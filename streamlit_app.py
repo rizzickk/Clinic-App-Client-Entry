@@ -256,9 +256,7 @@ import matplotlib.pyplot as plt
 st.divider()
 st.subheader("📊 Clinic Data Insights")
 
-
-# Get today's date in the correct format
-today_str = pd.Timestamp.today().strftime("%m/%d/%Y")
+today_str = today_local.strftime("%m/%d/%Y")  # Format it as MM/DD/YYYY
 
 # Filter data for today's appointments
 patients_today_df = existing_data[existing_data["Date"] == today_str]
