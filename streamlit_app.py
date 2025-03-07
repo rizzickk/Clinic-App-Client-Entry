@@ -39,7 +39,7 @@ def get_patient_data(patient_id):
     return None
 
 local_tz = pytz.timezone("America/Denver")
-today_local = datetime.now(local_tz).date()
+today_local = datetime.now(pytz.utc).astimezone(local_tz).date()
 
 # ---- NEW PATIENT FORM ----
 if option == "New Patient":
