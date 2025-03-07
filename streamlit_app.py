@@ -66,10 +66,12 @@ if option == "New Patient":
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
 
         appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None, placeholder="Select an option")
+        other_appt_type = ""
         if appointment_type == "Other":
             other_appt_type = st.text_input("Specify Other Appointment Type")
-            if other_appt_type:  # If the user enters a value, use that instead
-                appointment_type = other_appt_type
+
+# Use the custom value if entered
+final_appointment_type = other_appt_type if appointment_type == "Other" and other_appt_type else appointment_type
 
         # Time fields
         registration_start = st.time_input("Registration Start")
