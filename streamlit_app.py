@@ -64,14 +64,24 @@ if option == "New Patient":
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
+        # Initialize session state for dynamic updates
+        if "show_other_input" not in st.session_state:
+            st.session_state.show_other_input = False
 
+        # Select an appointment type
         appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None, placeholder="Select an option")
-        other_appt_type = ""
-    if appointment_type == "Other":
-        other_appt_type = st.text_input("Specify Other Appointment Type")
 
-    # Use the custom value if entered
-    final_appointment_type = other_appt_type if appointment_type == "Other" and other_appt_type else appointment_type
+        # Update session state dynamically when "Other" is selected
+        if appointment_type == "Other":
+            st.session_state.show_other_input = True
+        else:
+            st.session_state.show_other_input = False
+
+        # Show text input dynamically if "Other" is selected
+        if st.session_state.show_other_input:
+            other_appt_type = st.text_input("Specify Other Appointment Type")
+            if other_appt_type:
+                appointment_type = other_appt_type  # Override dropdown selection with user input
 
         # Time fields
         registration_start = st.time_input("Registration Start")
