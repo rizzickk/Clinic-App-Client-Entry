@@ -217,7 +217,7 @@ elif option == "Edit Patient":
                         time_out.strftime('%H:%M') if time_out else None
                     ]
                     
-                    conn.update(data=updated_data)
+                    updated_data = existing_data
                     st.success("Patient information updated successfully!")
 
 
