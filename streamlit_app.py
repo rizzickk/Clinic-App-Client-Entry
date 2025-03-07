@@ -53,7 +53,7 @@ if option == "New Patient":
 
     # Toggle to view existing data
     if not existing_data.empty:
-        show_table = st.checkbox("Show Existing Patient Data", value=False)
+        show_table = st.checkbox("Show Existing Patient Data (Last 20 Entries)", value=False)
         if show_table:
             st.dataframe(existing_data.tail(20))
     else:
@@ -70,18 +70,7 @@ if option == "New Patient":
 
         # Select an appointment type
         appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None, placeholder="Select an option")
-
-        # Update session state dynamically when "Other" is selected
-        if appointment_type == "Other":
-            st.session_state.show_other_input = True
-        else:
-            st.session_state.show_other_input = False
-
-        # Show text input dynamically if "Other" is selected
-        if st.session_state.show_other_input:
-            other_appt_type = st.text_input("Specify Other Appointment Type")
-            if other_appt_type:
-                appointment_type = other_appt_type  # Override dropdown selection with user input
+        appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value="", key="other_input", visible=st.session_state.show_other_input)
 
         # Time fields
         registration_start = st.time_input("Registration Start")
@@ -107,6 +96,7 @@ if option == "New Patient":
                 "Room": [room],
                 "ID": [id_],
                 "Appointment Type": [appointment_type],
+                "Describe Appointment Type If Applicable": [appointment_type_other],
                 "Registration Start": [registration_start.strftime('%H:%M')],
                 "Registration End": [registration_end.strftime("%H:%M")],
                 "Triage Start": [triage_start.strftime('%H:%M')],
@@ -139,7 +129,7 @@ elif option == "Edit Patient":
     
     # Toggle to view existing data
     if not existing_data.empty:
-        show_table = st.checkbox("Show Existing Patient Data", value=False)
+        show_table = st.checkbox("Show Existing Patient Data (Last 20 Entries)", value=False)
         if show_table:
             st.dataframe(existing_data)
     else:
@@ -164,9 +154,7 @@ elif option == "Edit Patient":
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
             appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
             appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
-
-            if appointment_type == "Other":
-                appointment_type = st.text_input("Specify Other Appointment Type", value=patient_data["Appointment Type"])
+            appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value="", key="other_input", visible=st.session_state.show_other_input)
 
             # Time fields pre-filled
             registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None)
@@ -192,6 +180,7 @@ elif option == "Edit Patient":
                     existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
                     existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
+                    existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M') if registration_end else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M') if triage_start else None
