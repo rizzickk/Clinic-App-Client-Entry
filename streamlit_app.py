@@ -64,9 +64,6 @@ if option == "New Patient":
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
-        # Initialize session state for dynamic updates
-        if "show_other_input" not in st.session_state:
-            st.session_state.show_other_input = False
 
         # Select an appointment type
         appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None, placeholder="Select an option")
