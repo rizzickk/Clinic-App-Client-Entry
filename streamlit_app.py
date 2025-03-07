@@ -246,10 +246,6 @@ elif option == "Edit Patient":
                     updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
                     st.success("New patient entry added successfully!")
 
-                if 'updated_data' in locals():
-                    conn.update(data=updated_data)
-                else:
-                    st.error("Error: No data to update.")
 
 
 st.subheader("Clinic Metrics")
