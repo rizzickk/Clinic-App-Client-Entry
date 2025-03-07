@@ -145,9 +145,9 @@ elif option == "Edit Patient":
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
             # Ensure 'Room' is properly extracted and converted
-            if "Room" in patient_data and not patient_data["Room"].isna().all():
+            if "Room" in patient_data and pd.notna(patient_data["Room"]):
                 try:
-                    room_value = str(int(float(patient_data["Room"].dropna().iloc[0])))  # Handle int and float values
+                    room_value = str(int(float(patient_data["Room"])))  # Convert to string
                 except ValueError:
                     room_value = ROOMS[0]  # Fallback in case of conversion error
             else:
