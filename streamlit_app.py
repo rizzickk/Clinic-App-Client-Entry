@@ -176,7 +176,7 @@ elif option == "Edit Patient":
                     existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
                     existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
-                    existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = str(appointment_type_other) if appointment_type_other else None
+                    existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = str(appointment_type_other)
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M') if registration_end else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Triage Start"] = triage_start.strftime('%H:%M') if triage_start else None
