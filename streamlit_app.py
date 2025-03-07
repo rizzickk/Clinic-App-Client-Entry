@@ -55,7 +55,7 @@ if option == "New Patient":
     if not existing_data.empty:
         show_table = st.checkbox("Show Existing Patient Data", value=False)
         if show_table:
-            st.dataframe(existing_data)
+            st.dataframe(existing_data.tail(20))
     else:
         st.warning("No data available yet.")
 
