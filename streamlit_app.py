@@ -144,7 +144,7 @@ elif option == "Edit Patient":
             staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
-            room_value = str(int(patient_data.get("Room", 0))) if patient_data.get("Room") not in [None, ""] else ROOMS[0]
+            room_value = str(int(patient_data["Room"])) if str(patient_data.get("Room", "")).isdigit() else ROOMS[0]
             room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
             room = st.selectbox("Room", options=ROOMS, index=room_index)
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
