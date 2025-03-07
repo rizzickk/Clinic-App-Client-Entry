@@ -150,7 +150,17 @@ elif option == "Edit Patient":
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
             appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
             appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
-            appointment_type_other = st.text_input("Describe Appointment Type If Applicable")
+                        # Fetch existing appointment type if it exists
+            existing_value = existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"]
+
+            # Ensure it's a valid value (avoid NaN issues)
+            if not existing_value.empty:
+                existing_value = existing_value.iloc[0]  # Get the first row's value
+            else:
+                existing_value = ""
+
+            # Now set st.text_input with this existing value
+            appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_value)
 
             # Time fields pre-filled
             registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None)
@@ -176,17 +186,7 @@ elif option == "Edit Patient":
                     existing_data.loc[existing_data["ID"] == selected_id, "Staff"] = staff
                     existing_data.loc[existing_data["ID"] == selected_id, "Room"] = room
                     existing_data.loc[existing_data["ID"] == selected_id, "Appointment Type"] = appointment_type
-                    # Fetch existing appointment type if it exists
-                    existing_value = existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"]
 
-                    # Ensure it's a valid value (avoid NaN issues)
-                    if not existing_value.empty:
-                        existing_value = existing_value.iloc[0]  # Get the first row's value
-                    else:
-                        existing_value = ""
-
-                    # Now set st.text_input with this existing value
-                    appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_value)
                     existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"] = appointment_type_other
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration Start"] = registration_start.strftime('%H:%M') if registration_start else None
                     existing_data.loc[existing_data["ID"] == selected_id, "Registration End"] = registration_end.strftime('%H:%M') if registration_end else None
