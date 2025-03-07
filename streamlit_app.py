@@ -70,8 +70,8 @@ if option == "New Patient":
         if appointment_type == "Other":
             other_appt_type = st.text_input("Specify Other Appointment Type")
 
-# Use the custom value if entered
-final_appointment_type = other_appt_type if appointment_type == "Other" and other_appt_type else appointment_type
+        # Use the custom value if entered
+        final_appointment_type = other_appt_type if appointment_type == "Other" and other_appt_type else appointment_type
 
         # Time fields
         registration_start = st.time_input("Registration Start")
