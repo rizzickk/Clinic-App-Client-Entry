@@ -62,7 +62,6 @@ if option == "New Patient":
     with st.form("new_patient_form"):
         date = st.date_input("Date", today_local)
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
-        staff_other = st.text_input("Other Dr Name if Applicable")
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
 
@@ -91,7 +90,6 @@ if option == "New Patient":
             new_entry = pd.DataFrame({
                 "Date": [date.strftime("%m/%d/%Y")],
                 "Staff": [staff],
-                "Staff Other": [staff_other],
                 "Room": [room],
                 "ID": [id_],
                 "Appointment Type": [appointment_type],
@@ -148,17 +146,17 @@ elif option == "Edit Patient":
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
 
-            # Fetch existing other staff if it exists
-            value_ex = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
+            # # Fetch existing other staff if it exists
+            # value_ex = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
 
-            # Ensure it's a valid value (avoid NaN issues)
-            if not value_ex.empty:
-                value_ex = value_ex.iloc[0]  # Get the first row's value
-            else:
-                value_ex = ""
+            # # Ensure it's a valid value (avoid NaN issues)
+            # if not value_ex.empty:
+            #     value_ex = value_ex.iloc[0]  # Get the first row's value
+            # else:
+            #     value_ex = ""
 
-            # Now set st.text_input with this existing value
-            staff_other = st.text_input("Other Dr Name if Applicable", value=value_ex)
+            # # Now set st.text_input with this existing value
+            # staff_other = st.text_input("Other Dr Name if Applicable", value=value_ex)
 
 
             # Ensure 'Room' is properly extracted and converted
@@ -223,7 +221,7 @@ elif option == "Edit Patient":
                         "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
                         "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
                     ] = [
-                        staff, staff_other, room, appointment_type, appointment_type_other,
+                        staff, room, appointment_type, appointment_type_other,
                         registration_start.strftime('%H:%M') if registration_start else None,
                         registration_end.strftime('%H:%M') if registration_end else None,
                         triage_start.strftime('%H:%M') if triage_start else None,
@@ -250,7 +248,6 @@ elif option == "Edit Patient":
                         "Date": [date.strftime("%m/%d/%Y")],
                         "ID": [selected_id],
                         "Staff": [staff],
-                        "Staff Other": [staff_other],
                         "Room": [room],
                         "Appointment Type": [appointment_type],
                         "Describe Appointment Type If Applicable": [appointment_type_other],
