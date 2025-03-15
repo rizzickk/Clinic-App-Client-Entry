@@ -149,7 +149,7 @@ elif option == "Edit Patient":
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
 
             # Fetch existing other staff if it exists
-            value = existing.loc[existing["ID"] == selected_id, "Other Dr Name if Applicable"]
+            value = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
 
             # Ensure it's a valid value (avoid NaN issues)
             if not value.empty and pd.notna(value.iloc[0]):
