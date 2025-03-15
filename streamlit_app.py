@@ -69,7 +69,7 @@ if option == "New Patient":
         appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None, placeholder="Select an option")
         appointment_type_other = st.text_input("Describe Appointment Type if Applicable")
         # Time fields
-        registration_start = st.time_input("Registration Start", step=60)
+        registration_start = st.time_input("Registration Start", value=time(0,0), step=60)
         registration_end = st.time_input("Registration End", step=60)
         triage_start = st.time_input("Triage Start", step=60)
         triage_end = st.time_input("Triage End", step=60)
