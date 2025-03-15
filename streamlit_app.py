@@ -62,26 +62,28 @@ if option == "New Patient":
     with st.form("new_patient_form"):
         date = st.date_input("Date", today_local)
         staff = st.selectbox("Staff", options=DOCTORS, index=None)
+        staff_other = st.text_input("Other Dr Name if Applicable")
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
 
         # Select an appointment type
         appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=None, placeholder="Select an option")
         appointment_type_other = st.text_input("Describe Appointment Type if Applicable")
+
         # Time fields
         registration_start = st.time_input("Registration Start", value=time(0,0), step=60)
-        registration_end = st.time_input("Registration End", step=60)
-        triage_start = st.time_input("Triage Start", step=60)
-        triage_end = st.time_input("Triage End", step=60)
-        time_roomed = st.time_input("Time Roomed", step=60)
-        exam_end = st.time_input("Exam End", step=60)
-        doctor_in = st.time_input("Doctor In", step=60)
-        doctor_out = st.time_input("Doctor Out", step=60)
-        lab_start = st.time_input("Lab Start", step=60)
-        lab_end = st.time_input("Lab End", step=60)
-        sw_start = st.time_input("SW Start", step=60)
-        sw_end = st.time_input("SW End", step=60)
-        time_out = st.time_input("Time Out", step=60)
+        registration_end = st.time_input("Registration End", value=time(0,0), step=60)
+        triage_start = st.time_input("Triage Start", value=time(0,0), step=60)
+        triage_end = st.time_input("Triage End", value=time(0,0), step=60)
+        time_roomed = st.time_input("Time Roomed", value=time(0,0), step=60)
+        exam_end = st.time_input("Exam End", value=time(0,0), step=60)
+        doctor_in = st.time_input("Doctor In", value=time(0,0),step=60)
+        doctor_out = st.time_input("Doctor Out", value=time(0,0), step=60)
+        lab_start = st.time_input("Lab Start", value=time(0,0), step=60)
+        lab_end = st.time_input("Lab End", value=time(0,0), step=60)
+        sw_start = st.time_input("SW Start", value=time(0,0), step=60)
+        sw_end = st.time_input("SW End", value=time(0,0), step=60)
+        time_out = st.time_input("Time Out", value=time(0,0), step=60)
 
         submit_button = st.form_submit_button(label="Add Patient")
 
@@ -89,6 +91,7 @@ if option == "New Patient":
             new_entry = pd.DataFrame({
                 "Date": [date.strftime("%m/%d/%Y")],
                 "Staff": [staff],
+                "Staff Other": [staff_other],
                 "Room": [room],
                 "ID": [id_],
                 "Appointment Type": [appointment_type],
@@ -170,6 +173,18 @@ elif option == "Edit Patient":
             # Now set st.text_input with this existing value
             appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_value)
 
+            # Fetch existing other staff if it exists
+            existing_value = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
+
+            # Ensure it's a valid value (avoid NaN issues)
+            if not existing_value.empty:
+                existing_value = existing_value.iloc[0]  # Get the first row's value
+            else:
+                existing_value = ""
+
+            # Now set st.text_input with this existing value
+            staff_other = st.text_input("Other Dr Name if Applicable", value=existing_value)
+
             # Time fields pre-filled
             registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None, step=60)
             registration_end = st.time_input("Registration End", value=pd.to_datetime(patient_data["Registration End"]).time() if patient_data["Registration End"] else None, step=60)
@@ -201,7 +216,7 @@ elif option == "Edit Patient":
                         "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
                         "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
                     ] = [
-                        staff, room, appointment_type, appointment_type_other,
+                        staff, staff_other, room, appointment_type, appointment_type_other,
                         registration_start.strftime('%H:%M') if registration_start else None,
                         registration_end.strftime('%H:%M') if registration_end else None,
                         triage_start.strftime('%H:%M') if triage_start else None,
@@ -228,6 +243,7 @@ elif option == "Edit Patient":
                         "Date": [date.strftime("%m/%d/%Y")],
                         "ID": [selected_id],
                         "Staff": [staff],
+                        "Staff Other": [staff_other],
                         "Room": [room],
                         "Appointment Type": [appointment_type],
                         "Describe Appointment Type If Applicable": [appointment_type_other],
