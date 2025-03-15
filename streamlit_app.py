@@ -147,6 +147,20 @@ elif option == "Edit Patient":
             staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
+
+            # Fetch existing other staff if it exists
+            value = existing.loc[existing["ID"] == selected_id, "Other Dr Name if Applicable"]
+
+            # Ensure it's a valid value (avoid NaN issues)
+            if not value.empty:
+                value = value.iloc[0]  # Get the first row's value
+            else:
+                value = ""
+
+            # Now set st.text_input with this existing value
+            staff_other = st.text_input("Other Dr Name if Applicable", value=value)
+
+
             # Ensure 'Room' is properly extracted and converted
             if "Room" in patient_data and pd.notna(patient_data["Room"]):
                 try:
@@ -157,6 +171,8 @@ elif option == "Edit Patient":
                 room_value = ROOMS[0]  # Default if 'Room' is missing or empty
             room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
             room = st.selectbox("Room", options=ROOMS, index=room_index)
+            
+            
             appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
             appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
             appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
@@ -173,17 +189,8 @@ elif option == "Edit Patient":
             # Now set st.text_input with this existing value
             appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_value)
 
-            # Fetch existing other staff if it exists
-            existing_value = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
 
-            # Ensure it's a valid value (avoid NaN issues)
-            if not existing_value.empty:
-                existing_value = existing_value.iloc[0]  # Get the first row's value
-            else:
-                existing_value = ""
 
-            # Now set st.text_input with this existing value
-            staff_other = st.text_input("Other Dr Name if Applicable", value=existing_value)
 
             # Time fields pre-filled
             registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None, step=60)
