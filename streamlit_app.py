@@ -152,7 +152,7 @@ elif option == "Edit Patient":
             value_ex = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
 
             # Ensure it's a valid value (avoid NaN issues)
-            if not value_ex.empty and pd.notna(value.iloc[0]):
+            if not value_ex.empty:
                 value_ex = value_ex.iloc[0]  # Get the first row's value
             else:
                 value_ex = ""
