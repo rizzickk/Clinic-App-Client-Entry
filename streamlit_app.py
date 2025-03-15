@@ -219,7 +219,7 @@ elif option == "Edit Patient":
                     # Update existing row
                     existing_data.loc[
                         (existing_data["ID"] == selected_id) & (existing_data["Date"] == date.strftime("%m/%d/%Y")),
-                        ["Staff", "Room", "Appointment Type", "Describe Appointment Type If Applicable",
+                        ["Staff", "staff_other", "Room", "Appointment Type", "Describe Appointment Type If Applicable",
                         "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
                         "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
                     ] = [
