@@ -2,7 +2,12 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
+# Define the UTC offset for Mountain Time (MST/MDT)
+MOUNTAIN_TIME_OFFSET = timedelta(hours=-7)  # MST is UTC-7, MDT is UTC-6
 
+# Get today's date in Mountain Time
+today_local = datetime.now(timezone.utc) + MOUNTAIN_TIME_OFFSET
+today_local = today_local.date()  # Extract only the date
 
 
 # Establish Google Sheets connection
@@ -40,12 +45,7 @@ def get_patient_data(patient_id):
 
 from datetime import datetime, timezone, timedelta
 
-# Define the UTC offset for Mountain Time (MST/MDT)
-MOUNTAIN_TIME_OFFSET = timedelta(hours=-7)  # MST is UTC-7, MDT is UTC-6
 
-# Get today's date in Mountain Time
-today_local = datetime.now(timezone.utc) + MOUNTAIN_TIME_OFFSET
-today_local = today_local.date()  # Extract only the date
 
 # ---- NEW PATIENT FORM ----
 if option == "New Patient":
@@ -141,7 +141,7 @@ elif option == "Edit Patient":
 
     if selected_id and patient_data:
         with st.form("edit_patient_form"):
-            date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"]))
+            date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"])) 
             staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
             staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
@@ -288,16 +288,16 @@ if not existing_data.empty:
     patients_today = len(existing_data[existing_data["Date"] == today_str])
 
     # Average Time Spent in Clinic (Time Out - Registration Start)
-    existing_data["Registration Start"] = pd.to_datetime(existing_data["Registration Start"], errors="coerce")
-    existing_data["Time Out"] = pd.to_datetime(existing_data["Time Out"], errors="coerce")
-    existing_data["Total Time"] = (existing_data["Time Out"] - existing_data["Registration Start"]).dt.total_seconds() / 60  # Convert to minutes
-    avg_time_spent = existing_data["Total Time"].mean()
+    # existing_data["Registration Start"] = pd.to_datetime(existing_data["Registration Start"], errors="coerce")
+    # existing_data["Time Out"] = pd.to_datetime(existing_data["Time Out"], errors="coerce")
+    # existing_data["Total Time"] = (existing_data["Time Out"] - existing_data["Registration Start"]).dt.total_seconds() / 60  # Convert to minutes
+    # avg_time_spent = existing_data["Total Time"].mean()
 
-    # Average Doctor Consultation Time (Doctor Out - Doctor In)
-    existing_data["Doctor In"] = pd.to_datetime(existing_data["Doctor In"], errors="coerce")
-    existing_data["Doctor Out"] = pd.to_datetime(existing_data["Doctor Out"], errors="coerce")
-    existing_data["Doctor Time"] = (existing_data["Doctor Out"] - existing_data["Doctor In"]).dt.total_seconds() / 60  # Convert to minutes
-    avg_doctor_time = existing_data["Doctor Time"].mean()
+    # # Average Doctor Consultation Time (Doctor Out - Doctor In)
+    # existing_data["Doctor In"] = pd.to_datetime(existing_data["Doctor In"], errors="coerce")
+    # existing_data["Doctor Out"] = pd.to_datetime(existing_data["Doctor Out"], errors="coerce")
+    # existing_data["Doctor Time"] = (existing_data["Doctor Out"] - existing_data["Doctor In"]).dt.total_seconds() / 60  # Convert to minutes
+    # avg_doctor_time = existing_data["Doctor Time"].mean()
 
     # Most Common Appointment Type
     common_appt = existing_data["Appointment Type"].mode()[0] if not existing_data["Appointment Type"].isna().all() else "N/A"
