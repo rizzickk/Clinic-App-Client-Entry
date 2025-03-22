@@ -165,30 +165,21 @@ elif option == "Edit Patient":
         else:
             st.warning("No matching patient ID found.")
 
+    doctor_options = DOCTORS + ["Other"]
+    staff_selection = st.selectbox("Staff", options=doctor_options)
+
+    if staff_selection == "Other":
+        other_staff = st.text_input("Enter Doctor Name", placeholder="Enter doctor's name")
+    else:
+        other_staff = ""
+
+final_staff = staff_selection if staff_selection != "Other" else other_staff
     if selected_id and patient_data:
         with st.form("edit_patient_form"):
             date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"])) 
             staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
-            staff_value = str(patient_data.get("Staff", "")).strip()
-            if staff_value in DOCTORS:
-                default_option = staff_value
-                default_other = ""
-            else:
-                default_option = "Other"
-                default_other = staff_value
-            
-            doctor_options = DOCTORS + ["Other"]
-            staff = st.selectbox("Staff", options=doctor_options, index=doctor_options.index(default_option))
-            
-            # Show the custom text input if "Other" is selected
-            if staff == "Other":
-                other_staff = st.text_input("Enter Doctor Name", value=default_other)
-            else:
-                other_staff = ""
-            
-            final_staff = staff if staff != "Other" else other_staff
-
+            st.write("Selected Doctor:", final_staff)
             # Ensure 'Room' is properly extracted and converted
             if "Room" in patient_data and pd.notna(patient_data["Room"]):
                 try:
