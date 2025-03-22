@@ -60,7 +60,7 @@ if option == "New Patient":
             )
             
             # Sort by the combined datetime column in descending order.
-            sorted_data = existing_data.sort_values(by="Combined_dt", ascending=False)
+            sorted_data = existing_data.sort_values(by="Combined_dt", ascending=True)
             
             # Optionally, drop the helper column if you don't want to display it.
             sorted_data = sorted_data.drop(columns=["Combined_dt"])
