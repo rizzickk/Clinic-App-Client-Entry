@@ -57,22 +57,23 @@ if option == "New Patient":
     else:
         st.warning("No data available yet.")
 
+    # Append "Other" to your doctor list
+    doctor_options = DOCTORS + ["Other"]
+    staff = st.selectbox("Staff", options=doctor_options)
+    
+    # If "Other" is selected, prompt for a custom doctor name.
+    if staff == "Other":
+        other_staff = st.text_input("Enter Doctor Name", placeholder="Enter doctor's name")
+    else:
+        other_staff = ""
+    
+    # Use the custom name if "Other" was chosen; otherwise use the selected name.
+    final_staff = staff if staff != "Other" else other_staff
+
     with st.form("new_patient_form"):
 
         date = st.date_input("Date", today_local)
-        
-        # Append "Other" to your doctor list
-        doctor_options = DOCTORS + ["Other"]
-        staff = st.selectbox("Staff", options=doctor_options)
-        
-        # If "Other" is selected, prompt for a custom doctor name.
-        if staff == "Other":
-            other_staff = st.text_input("Enter Doctor Name", placeholder="Enter doctor's name")
-        else:
-            other_staff = ""
-        
-        # Use the custom name if "Other" was chosen; otherwise use the selected name.
-        final_staff = staff if staff != "Other" else other_staff
+        st.write("Selected Doctor:", final_staff)
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
 
