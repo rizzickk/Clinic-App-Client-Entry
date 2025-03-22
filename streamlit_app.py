@@ -49,14 +49,22 @@ def get_patient_data(patient_id):
 if option == "New Patient":
     st.subheader("New Patient Entry")
 
-    # Toggle to view existing data
     if not existing_data.empty:
-        show_table = st.checkbox("Show Existing Patient Data (Last 20 Entries)", value=False)
-        if show_table:
-            st.dataframe(existing_data.tail(20))
+        # Convert the "Registration Start" column to datetime objects.
+        # Note: This conversion assumes that the times are stored in the format "HH:MM".
+        existing_data["Registration_Start_dt"] = pd.to_datetime(existing_data["Registration Start"], format="%H:%M", errors="coerce")
+        
+        # Sort by the new datetime column in descending order (most recent times first)
+        sorted_data = existing_data.sort_values(by="Registration_Start_dt", ascending=False)
+        
+        # Optionally remove the helper column before display
+        sorted_data = sorted_data.drop(columns=["Registration_Start_dt"])
+        
+        # Display the top 20 most recent entries based on registration start time
+        st.dataframe(sorted_data.head(20))
     else:
         st.warning("No data available yet.")
-
+    
     # Append "Other" to your doctor list
     doctor_options = DOCTORS + ["Other"]
     staff = st.selectbox("Staff", options=doctor_options)
