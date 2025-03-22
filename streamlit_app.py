@@ -58,8 +58,21 @@ if option == "New Patient":
         st.warning("No data available yet.")
 
     with st.form("new_patient_form"):
+
         date = st.date_input("Date", today_local)
-        staff = st.selectbox("Staff", options=DOCTORS, index=None)
+        
+        # Append "Other" to your doctor list
+        doctor_options = DOCTORS + ["Other"]
+        staff = st.selectbox("Staff", options=doctor_options)
+        
+        # If "Other" is selected, prompt for a custom doctor name.
+        if staff == "Other":
+            other_staff = st.text_input("Enter Doctor Name", placeholder="Enter doctor's name")
+        else:
+            other_staff = ""
+        
+        # Use the custom name if "Other" was chosen; otherwise use the selected name.
+        final_staff = staff if staff != "Other" else other_staff
         room = st.selectbox("Room", options=ROOMS, index=None)
         id_ = st.number_input("ID", min_value=0, max_value=1000000)
 
@@ -87,7 +100,7 @@ if option == "New Patient":
         if submit_button:
             new_entry = pd.DataFrame({
                 "Date": [date.strftime("%m/%d/%Y")],
-                "Staff": [staff],
+                "Staff": [final_staff],
                 "Room": [room],
                 "ID": [id_],
                 "Appointment Type": [appointment_type],
@@ -142,20 +155,24 @@ elif option == "Edit Patient":
             date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"])) 
             staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
             staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
-            staff = st.selectbox("Staff", options=DOCTORS, index=staff_index)
-
-            # # Fetch existing other staff if it exists
-            # value_ex = existing_data.loc[existing_data["ID"] == selected_id, "Other Dr Name if Applicable"]
-
-            # # Ensure it's a valid value (avoid NaN issues)
-            # if not value_ex.empty:
-            #     value_ex = value_ex.iloc[0]  # Get the first row's value
-            # else:
-            #     value_ex = ""
-
-            # # Now set st.text_input with this existing value
-            # staff_other = st.text_input("Other Dr Name if Applicable", value=value_ex)
-
+            staff_value = str(patient_data.get("Staff", "")).strip()
+            if staff_value in DOCTORS:
+                default_option = staff_value
+                default_other = ""
+            else:
+                default_option = "Other"
+                default_other = staff_value
+            
+            doctor_options = DOCTORS + ["Other"]
+            staff = st.selectbox("Staff", options=doctor_options, index=doctor_options.index(default_option))
+            
+            # Show the custom text input if "Other" is selected
+            if staff == "Other":
+                other_staff = st.text_input("Enter Doctor Name", value=default_other)
+            else:
+                other_staff = ""
+            
+            final_staff = staff if staff != "Other" else other_staff
 
             # Ensure 'Room' is properly extracted and converted
             if "Room" in patient_data and pd.notna(patient_data["Room"]):
@@ -219,7 +236,7 @@ elif option == "Edit Patient":
                         "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
                         "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
                     ] = [
-                        staff, room, appointment_type, appointment_type_other,
+                        final_staff, room, appointment_type, appointment_type_other,
                         registration_start.strftime('%H:%M') if registration_start else None,
                         registration_end.strftime('%H:%M') if registration_end else None,
                         triage_start.strftime('%H:%M') if triage_start else None,
@@ -245,7 +262,7 @@ elif option == "Edit Patient":
                     new_entry = pd.DataFrame({
                         "Date": [date.strftime("%m/%d/%Y")],
                         "ID": [selected_id],
-                        "Staff": [staff],
+                        "Staff": [final_staff],
                         "Room": [room],
                         "Appointment Type": [appointment_type],
                         "Describe Appointment Type If Applicable": [appointment_type_other],
