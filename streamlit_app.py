@@ -49,10 +49,6 @@ def get_patient_data(patient_id):
 if option == "New Patient":
     st.subheader("New Patient Entry")
 
-    if not existing_data.empty:
-        
-    else:
-        st.warning("No data available yet.")
     # Toggle to view existing data
     if not existing_data.empty:
         show_table = st.checkbox("Show Existing Patient Data (Last 20 Entries)", value=False)
@@ -69,8 +65,8 @@ if option == "New Patient":
             
             # Display the top 20 most recent entries based on registration start time
             st.dataframe(sorted_data.head(20))
-        else:
-            st.warning("No data available yet.")
+    else:
+        st.warning("No data available yet.")
 
     # Append "Other" to your doctor list
     doctor_options = DOCTORS + ["Other"]
