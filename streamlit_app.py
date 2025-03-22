@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
 # Use America/Denver for Mountain Time with DST support
@@ -215,7 +215,7 @@ elif option == "Edit Patient":
                     # Update existing row
                     existing_data.loc[
                         (existing_data["ID"] == selected_id) & (existing_data["Date"] == date.strftime("%m/%d/%Y")),
-                        ["Staff", "staff_other", "Room", "Appointment Type", "Describe Appointment Type If Applicable",
+                        ["Staff", "Room", "Appointment Type", "Describe Appointment Type If Applicable",
                         "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
                         "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
                     ] = [
