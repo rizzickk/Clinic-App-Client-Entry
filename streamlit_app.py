@@ -69,8 +69,8 @@ if option == "New Patient":
             
             # Display the top 20 most recent entries based on registration start time
             st.dataframe(sorted_data.head(20))
-    else:
-        st.warning("No data available yet.")
+        else:
+            st.warning("No data available yet.")
 
     # Append "Other" to your doctor list
     doctor_options = DOCTORS + ["Other"]
