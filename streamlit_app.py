@@ -173,7 +173,8 @@ elif option == "Edit Patient":
     else:
         other_staff = ""
 
-final_staff = staff_selection if staff_selection != "Other" else other_staff
+    final_staff = staff_selection if staff_selection != "Other" else other_staff
+    
     if selected_id and patient_data:
         with st.form("edit_patient_form"):
             date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"])) 
