@@ -12,6 +12,33 @@ today_local = datetime.now(ZoneInfo("America/Denver")).date()
 conn = st.connection("gsheets", type=GSheetsConnection)
 existing_data = conn.read(ttl=0)
 
+# ----------------- Helper Functions -----------------
+def safe_to_datetime(value, fmt=None):
+    """
+    Safely converts a value to a datetime object.
+    Returns None if the value is missing, empty, or invalid.
+    """
+    if pd.isna(value) or value in ["", None]:
+        return None
+    try:
+        if fmt:
+            return pd.to_datetime(value, format=fmt, errors="coerce")
+        else:
+            return pd.to_datetime(value, errors="coerce")
+    except Exception:
+        return None
+
+def safe_to_time(value, fmt="%H:%M"):
+    """
+    Converts a value (assumed to be a string in a given format) to a time object.
+    Returns time(0, 0) as a default if conversion fails.
+    """
+    dt = safe_to_datetime(value, fmt=fmt)
+    if dt is not None:
+        return dt.time()
+    return time(0, 0)
+
+# ----------------- App UI -----------------
 # Display Title
 st.title("Client Tracker")
 
@@ -45,7 +72,7 @@ def get_patient_data(patient_id):
 
 
 
-# ---- NEW PATIENT FORM ----
+# ----------------- NEW PATIENT FORM -----------------
 if option == "New Patient":
     st.subheader("New Patient Entry")
 
@@ -144,7 +171,11 @@ if option == "New Patient":
 
             st.success("Patient added successfully!")
 
-# ---- EDIT EXISTING PATIENT FORM ----
+
+
+
+# ----------------- EDIT EXISTING PATIENT FORM -----------------
+
 elif option == "Edit Patient":
     st.subheader("Edit Existing Patient")
 
@@ -192,126 +223,163 @@ elif option == "Edit Patient":
         final_staff = staff_selection if staff_selection != "Other" else other_staff
     
     if selected_id and patient_data:
-        with st.form("edit_patient_form"):
-            date = st.date_input("Date", value=pd.to_datetime(patient_data["Date"])) 
-            staff_value = str(patient_data.get("Staff", "")).strip() if patient_data.get("Staff") else DOCTORS[0]
-            staff_index = DOCTORS.index(staff_value) if staff_value in DOCTORS else 0  # Default to index 0 if not found
-            st.write("Selected Doctor:", final_staff)
-            # Ensure 'Room' is properly extracted and converted
-            if "Room" in patient_data and pd.notna(patient_data["Room"]):
-                try:
-                    room_value = str(int(float(patient_data["Room"])))  # Convert to string
-                except ValueError:
-                    room_value = ROOMS[0]  # Fallback in case of conversion error
+            # Safely prepopulate fields using helper functions
+            stored_date = safe_to_datetime(patient_data.get("Date"), fmt="%m/%d/%Y")
+            default_date = stored_date.date() if stored_date is not None else today_local
+
+            # Prepopulate doctor info
+            stored_staff = str(patient_data.get("Staff", "")).strip()
+            if stored_staff in DOCTORS:
+                default_staff = stored_staff
+                default_other = ""
             else:
-                room_value = ROOMS[0]  # Default if 'Room' is missing or empty
+                default_staff = "Other"
+                default_other = stored_staff
+            doctor_options = DOCTORS + ["Other"]
+            # Doctor selection outside the form for immediate reactivity
+            staff_selection = st.selectbox("Staff", options=doctor_options, index=doctor_options.index(default_staff))
+            if staff_selection == "Other":
+                other_staff = st.text_input("Enter Doctor Name", value=default_other, placeholder="Enter doctor's name")
+            else:
+                other_staff = ""
+            final_staff = staff_selection if staff_selection != "Other" else other_staff
+
+            # Prepopulate room field safely
+            stored_room = str(patient_data.get("Room", "")).strip()
+            try:
+                room_value = str(int(float(stored_room))) if stored_room not in ["", "nan", "NaN"] else ROOMS[0]
+            except Exception:
+                room_value = ROOMS[0]
             room_index = ROOMS.index(room_value) if room_value in ROOMS else 0
             room = st.selectbox("Room", options=ROOMS, index=room_index)
             
-            
-            appt_value = str(patient_data["Appointment Type"]).strip() if "Appointment Type" in patient_data and patient_data["Appointment Type"] is not None else APPT_TYPES[0]
-            appt_index = APPT_TYPES.index(appt_value) if appt_value in APPT_TYPES else 0  # Default to first option if not found
+            stored_appt = str(patient_data.get("Appointment Type", "")).strip() if patient_data.get("Appointment Type") else APPT_TYPES[0]
+            appt_index = APPT_TYPES.index(stored_appt) if stored_appt in APPT_TYPES else 0
             appointment_type = st.selectbox("Appointment Type", options=APPT_TYPES, index=appt_index)
             
-            # Fetch existing appointment type if it exists
-            existing_value = existing_data.loc[existing_data["ID"] == selected_id, "Describe Appointment Type If Applicable"]
-
-            # Ensure it's a valid value (avoid NaN issues)
-            if not existing_value.empty:
-                existing_value = existing_value.iloc[0]  # Get the first row's value
-            else:
-                existing_value = ""
-
-            # Now set st.text_input with this existing value
-            appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_value)
-
-
-
-
-            # Time fields pre-filled
-            registration_start = st.time_input("Registration Start", value=pd.to_datetime(patient_data["Registration Start"]).time() if patient_data["Registration Start"] else None, step=60)
-            registration_end = st.time_input("Registration End", value=pd.to_datetime(patient_data["Registration End"]).time() if patient_data["Registration End"] else None, step=60)
-            triage_start = st.time_input("Triage Start", value=pd.to_datetime(patient_data["Triage Start"]).time() if patient_data["Triage Start"] else None, step=60)
-            triage_end = st.time_input("Triage End", value=pd.to_datetime(patient_data["Triage End"]).time() if patient_data["Triage End"] else None, step=60)
-            time_roomed = st.time_input("Time Roomed", value=pd.to_datetime(patient_data["Time Roomed"]).time() if patient_data["Time Roomed"] else None, step=60)
-            exam_end = st.time_input("Exam End", value=pd.to_datetime(patient_data["Exam End"]).time() if patient_data["Exam End"] else None, step=60)
-            doctor_in = st.time_input("Doctor In", value=pd.to_datetime(patient_data["Doctor In"]).time() if patient_data["Doctor In"] else None, step=60)
-            doctor_out = st.time_input("Doctor Out", value=pd.to_datetime(patient_data["Doctor Out"]).time() if patient_data["Doctor Out"] else None, step=60)
-            lab_start = st.time_input("Lab Start", value=pd.to_datetime(patient_data["Lab Start"]).time() if patient_data["Lab Start"] else None, step=60)
-            lab_end = st.time_input("Lab End", value=pd.to_datetime(patient_data["Lab End"]).time() if patient_data["Lab End"] else None, step=60)
-            sw_start = st.time_input("SW Start", value=pd.to_datetime(patient_data["SW Start"]).time() if patient_data["SW Start"] else None, step=60)
-            sw_end = st.time_input("SW End", value=pd.to_datetime(patient_data["SW End"]).time() if patient_data["SW End"] else None, step=60)
-            time_out = st.time_input("Time Out", value=pd.to_datetime(patient_data["Time Out"]).time() if patient_data["Time Out"] else None, step=60)
-                        
-            update_button = st.form_submit_button(label="Update Patient")
-
-            if update_button:
-                # Ensure selected_id exists in the DataFrame before modifying
-                existing_entry = existing_data[
-                (existing_data["ID"] == selected_id) & (existing_data["Date"] == date.strftime("%m/%d/%Y"))
-    ]
-
-                if not existing_entry.empty:
-                    # Update existing row
-                    existing_data.loc[
-                        (existing_data["ID"] == selected_id) & (existing_data["Date"] == date.strftime("%m/%d/%Y")),
-                        ["Staff", "Room", "Appointment Type", "Describe Appointment Type If Applicable",
-                        "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
-                        "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
-                    ] = [
-                        final_staff, room, appointment_type, appointment_type_other,
-                        registration_start.strftime('%H:%M') if registration_start else None,
-                        registration_end.strftime('%H:%M') if registration_end else None,
-                        triage_start.strftime('%H:%M') if triage_start else None,
-                        triage_end.strftime('%H:%M') if triage_end else None,
-                        time_roomed.strftime('%H:%M') if time_roomed else None,
-                        exam_end.strftime('%H:%M') if exam_end else None,
-                        doctor_in.strftime('%H:%M') if doctor_in else None,
-                        doctor_out.strftime('%H:%M') if doctor_out else None,
-                        lab_start.strftime('%H:%M') if lab_start else None,
-                        lab_end.strftime('%H:%M') if lab_end else None,
-                        sw_start.strftime('%H:%M') if sw_start else None,
-                        sw_end.strftime('%H:%M') if sw_end else None,
-                        time_out.strftime('%H:%M') if time_out else None
+            existing_appt_desc = patient_data.get("Describe Appointment Type If Applicable", "")
+            if pd.isna(existing_appt_desc):
+                existing_appt_desc = ""
+            appointment_type_other = st.text_input("Describe Appointment Type if Applicable", value=existing_appt_desc)
+            
+            # Safely prepopulate time fields
+            stored_reg_start = safe_to_datetime(patient_data.get("Registration Start"), fmt="%H:%M")
+            default_reg_start = stored_reg_start.time() if stored_reg_start is not None else time(0, 0)
+            registration_start = st.time_input("Registration Start", value=default_reg_start, step=60)
+            
+            stored_reg_end = safe_to_datetime(patient_data.get("Registration End"), fmt="%H:%M")
+            default_reg_end = stored_reg_end.time() if stored_reg_end is not None else time(0, 0)
+            registration_end = st.time_input("Registration End", value=default_reg_end, step=60)
+            
+            stored_triage_start = safe_to_datetime(patient_data.get("Triage Start"), fmt="%H:%M")
+            default_triage_start = stored_triage_start.time() if stored_triage_start is not None else time(0, 0)
+            triage_start = st.time_input("Triage Start", value=default_triage_start, step=60)
+            
+            stored_triage_end = safe_to_datetime(patient_data.get("Triage End"), fmt="%H:%M")
+            default_triage_end = stored_triage_end.time() if stored_triage_end is not None else time(0, 0)
+            triage_end = st.time_input("Triage End", value=default_triage_end, step=60)
+            
+            stored_time_roomed = safe_to_datetime(patient_data.get("Time Roomed"), fmt="%H:%M")
+            default_time_roomed = stored_time_roomed.time() if stored_time_roomed is not None else time(0, 0)
+            time_roomed = st.time_input("Time Roomed", value=default_time_roomed, step=60)
+            
+            stored_exam_end = safe_to_datetime(patient_data.get("Exam End"), fmt="%H:%M")
+            default_exam_end = stored_exam_end.time() if stored_exam_end is not None else time(0, 0)
+            exam_end = st.time_input("Exam End", value=default_exam_end, step=60)
+            
+            stored_doc_in = safe_to_datetime(patient_data.get("Doctor In"), fmt="%H:%M")
+            default_doc_in = stored_doc_in.time() if stored_doc_in is not None else time(0, 0)
+            doctor_in = st.time_input("Doctor In", value=default_doc_in, step=60)
+            
+            stored_doc_out = safe_to_datetime(patient_data.get("Doctor Out"), fmt="%H:%M")
+            default_doc_out = stored_doc_out.time() if stored_doc_out is not None else time(0, 0)
+            doctor_out = st.time_input("Doctor Out", value=default_doc_out, step=60)
+            
+            stored_lab_start = safe_to_datetime(patient_data.get("Lab Start"), fmt="%H:%M")
+            default_lab_start = stored_lab_start.time() if stored_lab_start is not None else time(0, 0)
+            lab_start = st.time_input("Lab Start", value=default_lab_start, step=60)
+            
+            stored_lab_end = safe_to_datetime(patient_data.get("Lab End"), fmt="%H:%M")
+            default_lab_end = stored_lab_end.time() if stored_lab_end is not None else time(0, 0)
+            lab_end = st.time_input("Lab End", value=default_lab_end, step=60)
+            
+            stored_sw_start = safe_to_datetime(patient_data.get("SW Start"), fmt="%H:%M")
+            default_sw_start = stored_sw_start.time() if stored_sw_start is not None else time(0, 0)
+            sw_start = st.time_input("SW Start", value=default_sw_start, step=60)
+            
+            stored_sw_end = safe_to_datetime(patient_data.get("SW End"), fmt="%H:%M")
+            default_sw_end = stored_sw_end.time() if stored_sw_end is not None else time(0, 0)
+            sw_end = st.time_input("SW End", value=default_sw_end, step=60)
+            
+            stored_time_out = safe_to_datetime(patient_data.get("Time Out"), fmt="%H:%M")
+            default_time_out = stored_time_out.time() if stored_time_out is not None else time(0, 0)
+            time_out = st.time_input("Time Out", value=default_time_out, step=60)
+            
+            with st.form("edit_patient_form"):
+                date = st.date_input("Date", value=default_date)
+                st.write("Selected Doctor:", final_staff)
+                # Add additional fields as needed here...
+                
+                update_button = st.form_submit_button(label="Update Patient")
+                if update_button:
+                    # Identify the existing entry by matching ID and Date
+                    existing_entry = existing_data[
+                        (existing_data["ID"] == selected_id) &
+                        (existing_data["Date"] == date.strftime("%m/%d/%Y"))
                     ]
-                    
-                    updated_data = existing_data
-                    conn.update(data=updated_data)
-                    st.success("Patient information updated successfully!")
-
-
-                else:
-                    # Create a new entry instead of updating
-                    new_entry = pd.DataFrame({
-                        "Date": [date.strftime("%m/%d/%Y")],
-                        "ID": [selected_id],
-                        "Staff": [final_staff],
-                        "Room": [room],
-                        "Appointment Type": [appointment_type],
-                        "Describe Appointment Type If Applicable": [appointment_type_other],
-                        "Registration Start": [registration_start.strftime('%H:%M') if registration_start else None],
-                        "Registration End": [registration_end.strftime('%H:%M') if registration_end else None],
-                        "Triage Start": [triage_start.strftime('%H:%M') if triage_start else None],
-                        "Triage End": [triage_end.strftime('%H:%M') if triage_end else None],
-                        "Time Roomed": [time_roomed.strftime('%H:%M') if time_roomed else None],
-                        "Exam End": [exam_end.strftime('%H:%M') if exam_end else None],
-                        "Doctor In": [doctor_in.strftime('%H:%M') if doctor_in else None],
-                        "Doctor Out": [doctor_out.strftime('%H:%M') if doctor_out else None],
-                        "Lab Start": [lab_start.strftime('%H:%M') if lab_start else None],
-                        "Lab End": [lab_end.strftime('%H:%M') if lab_end else None],
-                        "SW Start": [sw_start.strftime('%H:%M') if sw_start else None],
-                        "SW End": [sw_end.strftime('%H:%M') if sw_end else None],
-                        "Time Out": [time_out.strftime('%H:%M') if time_out else None]
-                    })
-
-                    # Append to existing data
-                    if existing_data.empty:
-                        updated_data = new_entry
+                    if not existing_entry.empty:
+                        existing_data.loc[
+                            (existing_data["ID"] == selected_id) &
+                            (existing_data["Date"] == date.strftime("%m/%d/%Y")),
+                            ["Staff", "Room", "Appointment Type", "Describe Appointment Type If Applicable",
+                            "Registration Start", "Registration End", "Triage Start", "Triage End", "Time Roomed",
+                            "Exam End", "Doctor In", "Doctor Out", "Lab Start", "Lab End", "SW Start", "SW End", "Time Out"]
+                        ] = [
+                            final_staff, room, appointment_type, appointment_type_other,
+                            registration_start.strftime('%H:%M') if registration_start else None,
+                            registration_end.strftime('%H:%M') if registration_end else None,
+                            triage_start.strftime('%H:%M') if triage_start else None,
+                            triage_end.strftime('%H:%M') if triage_end else None,
+                            time_roomed.strftime('%H:%M') if time_roomed else None,
+                            exam_end.strftime('%H:%M') if exam_end else None,
+                            doctor_in.strftime('%H:%M') if doctor_in else None,
+                            doctor_out.strftime('%H:%M') if doctor_out else None,
+                            lab_start.strftime('%H:%M') if lab_start else None,
+                            lab_end.strftime('%H:%M') if lab_end else None,
+                            sw_start.strftime('%H:%M') if sw_start else None,
+                            sw_end.strftime('%H:%M') if sw_end else None,
+                            time_out.strftime('%H:%M') if time_out else None
+                        ]
+                        conn.update(data=existing_data)
+                        st.success("Patient information updated successfully!")
                     else:
-                        updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
-                    
-                    conn.update(data=updated_data)
-                    st.success("Patient information updated successfully!")
+                        new_entry = pd.DataFrame({
+                            "Date": [date.strftime("%m/%d/%Y")],
+                            "ID": [selected_id],
+                            "Staff": [final_staff],
+                            "Room": [room],
+                            "Appointment Type": [appointment_type],
+                            "Describe Appointment Type If Applicable": [appointment_type_other],
+                            "Registration Start": [registration_start.strftime('%H:%M') if registration_start else None],
+                            "Registration End": [registration_end.strftime('%H:%M') if registration_end else None],
+                            "Triage Start": [triage_start.strftime('%H:%M') if triage_start else None],
+                            "Triage End": [triage_end.strftime('%H:%M') if triage_end else None],
+                            "Time Roomed": [time_roomed.strftime('%H:%M') if time_roomed else None],
+                            "Exam End": [exam_end.strftime('%H:%M') if exam_end else None],
+                            "Doctor In": [doctor_in.strftime('%H:%M') if doctor_in else None],
+                            "Doctor Out": [doctor_out.strftime('%H:%M') if doctor_out else None],
+                            "Lab Start": [lab_start.strftime('%H:%M') if lab_start else None],
+                            "Lab End": [lab_end.strftime('%H:%M') if lab_end else None],
+                            "SW Start": [sw_start.strftime('%H:%M') if sw_start else None],
+                            "SW End": [sw_end.strftime('%H:%M') if sw_end else None],
+                            "Time Out": [time_out.strftime('%H:%M') if time_out else None]
+                        })
+                        if existing_data.empty:
+                            updated_data = new_entry
+                        else:
+                            updated_data = pd.concat([existing_data, new_entry], ignore_index=True)
+                        conn.update(data=updated_data)
+                        st.success("Patient information updated successfully!")
 
 
 
