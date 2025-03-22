@@ -195,32 +195,7 @@ elif option == "Edit Patient":
             st.success("Patient found! Modify the details below and click 'Update'.")
         else:
             st.warning("No matching patient ID found.")
-        # Retrieve the stored doctor value from Google Sheets
-        stored_doctor = str(patient_data.get("Staff", "")).strip()
-        
-        # Determine default selection: if the stored doctor is in DOCTORS, use that;
-        # otherwise, default to "Other" and prefill the text input with the stored doctor name.
-        if stored_doctor in DOCTORS:
-            default_selection = stored_doctor
-            default_other = ""
-        else:
-            default_selection = "Other"
-            default_other = stored_doctor
-        
-        # Create the doctor options list
-        doctor_options = DOCTORS + ["Other"]
-        
-        # Place the selectbox outside the form for reactivity
-        staff_selection = st.selectbox("Staff", options=doctor_options, index=doctor_options.index(default_selection))
-        
-        # Show text input if "Other" is selected, prefilled with stored value if available
-        if staff_selection == "Other":
-            other_staff = st.text_input("Enter Doctor Name", value=default_other, placeholder="Enter doctor's name")
-        else:
-            other_staff = ""
-        
-        # Determine final doctor value
-        final_staff = staff_selection if staff_selection != "Other" else other_staff
+     
     
     if selected_id and patient_data:
             # Safely prepopulate fields using helper functions
