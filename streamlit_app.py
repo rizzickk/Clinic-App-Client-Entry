@@ -53,17 +53,19 @@ if option == "New Patient":
     if not existing_data.empty:
         show_table = st.checkbox("Show Existing Patient Data (Last 20 Entries)", value=False)
         if show_table:
-            # Convert the "Registration Start" column to datetime objects.
-            # Note: This conversion assumes that the times are stored in the format "HH:MM".
-            existing_data["Registration_Start_dt"] = pd.to_datetime(existing_data["Registration Start"], format="%H:%M", errors="coerce")
+            existing_data["Combined_dt"] = pd.to_datetime(
+            existing_data["Date"] + " " + existing_data["Registration Start"],
+            format="%m/%d/%Y %H:%M",
+            errors="coerce"
+            )
             
-            # Sort by the new datetime column in descending order (most recent times first)
-            sorted_data = existing_data.sort_values(by="Registration_Start_dt", ascending=False)
+            # Sort by the combined datetime column in descending order.
+            sorted_data = existing_data.sort_values(by="Combined_dt", ascending=False)
             
-            # Optionally remove the helper column before display
-            sorted_data = sorted_data.drop(columns=["Registration_Start_dt"])
+            # Optionally, drop the helper column if you don't want to display it.
+            sorted_data = sorted_data.drop(columns=["Combined_dt"])
             
-            # Display the top 20 most recent entries based on registration start time
+            # Display the top 20 most recent entries.
             st.dataframe(sorted_data.head(20))
     else:
         st.warning("No data available yet.")
