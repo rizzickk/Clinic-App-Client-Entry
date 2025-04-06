@@ -122,7 +122,7 @@ filtered_df = df[df['Visit Category'].str.lower() != 'other']
 
 # Convert to weekly period start date
 filtered_df['Week'] = filtered_df['Date'].dt.to_period('W').apply(lambda r: r.start_time)
-st.header("Weekly Visit Mix Change")
+
 
 # Ensure proper datetime
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
@@ -130,7 +130,7 @@ df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 # Filter out 'Other' (case insensitive)
 filtered_df = df[df['Visit Category'].str.lower() != 'other']
 
-st.header("Monthly Visit Mix Change")
+
 
 # Ensure datetime format
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
