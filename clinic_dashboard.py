@@ -83,7 +83,7 @@ st.metric("Triage Path Coverage", f"{both_triage / total:.0%}")
 st.caption("Percentage of patients that went through triage.")
 st.metric("Avg Time from Arrival to Room (min)", f"{df['Arrival to Room'].mean():.1f}")
 
-st.header("Visit Mix")
+st.header("Visit Mix %")
 visit_mix = df['Visit Type'].value_counts(normalize=True) * 100
 visit_mix = visit_mix.round(1)
 
