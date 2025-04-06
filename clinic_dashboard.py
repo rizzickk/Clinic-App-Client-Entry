@@ -122,8 +122,18 @@ filtered_df = df[df['Visit Category'].str.lower() != 'other']
 
 # Convert to weekly period start date
 filtered_df['Week'] = filtered_df['Date'].dt.to_period('W').apply(lambda r: r.start_time)
+st.header("Weekly Visit Mix Change")
 
-# Weekly mix: number of visits per category, per week
+# Ensure proper datetime
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+
+# Filter out 'Other' (case insensitive)
+filtered_df = df[df['Visit Category'].str.lower() != 'other']
+
+# Convert to week start
+filtered_df['Week'] = filtered_df['Date'].dt.to_period('W').apply(lambda r: r.start_time)
+
+# Weekly visit counts by category
 weekly_mix = (
     filtered_df.groupby(['Week', 'Visit Category'])
     .size()
@@ -131,14 +141,26 @@ weekly_mix = (
     .fillna(0)
 )
 
-# Compare most recent week to prior week
 if len(weekly_mix) >= 2:
     last_week = weekly_mix.iloc[-1]
     prev_week = weekly_mix.iloc[-2]
-    delta = (last_week - prev_week) / prev_week.replace(0, np.nan)
 
-    st.dataframe(
-        delta.dropna()
-        .sort_values(ascending=False)
-        .apply(lambda x: f"{x:+.1%}")
-    )
+    # Only keep categories that had visits in both weeks
+    mask = (prev_week > 0) & (last_week > 0)
+    last_week = last_week[mask]
+    prev_week = prev_week[mask]
+
+    delta = ((last_week - prev_week) / prev_week).round(3)
+
+    # Combine into a nice DataFrame
+    delta_df = pd.DataFrame({
+        'Prev Week': prev_week.astype(int),
+        'Last Week': last_week.astype(int),
+        '% Change': delta.apply(lambda x: f"{x:+.1%}")
+    }).sort_values(by='% Change', ascending=False)
+
+    st.dataframe(delta_df)
+
+    st.caption("Week-over-week change excluding 'Other'. Only categories with activity in both weeks are shown.")
+else:
+    st.info("Not enough weekly data to compare trends.")
