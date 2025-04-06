@@ -107,10 +107,14 @@ bar = alt.Chart(cat_dist).mark_bar().encode(
 )
 
 st.altair_chart(bar, use_container_width=True)
-st.caption("Visit categories sorted from most to least frequent (excluding 'Other').")
+
 
 st.header("Top 5 Visit Categories")
-st.write(cat_dist.head(5))
+
+top5 = cat_dist.head(5).reset_index()
+top5.columns = ['Visit Category', 'Count']  # optional: name the columns
+
+st.dataframe(top5, use_container_width=True)
 
 st.header("Weekly Visit Mix Change")
 # Correct way to set the weekly periods
