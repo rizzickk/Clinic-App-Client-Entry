@@ -131,7 +131,7 @@ st.altair_chart(bar, use_container_width=True)
 st.header("Top 5 Visit Categories")
 st.write(cat_dist.head(5))
 
-st.header("Weekly Visit Mix Change")
+st.header("Monthly Visit Mix Change")
 
 # Ensure 'Date' is datetime
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
