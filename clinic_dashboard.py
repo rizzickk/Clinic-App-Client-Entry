@@ -41,8 +41,11 @@ if 'Staff' in df.columns:
     doc_stats = doc_df.groupby('Staff').agg(
         Avg_Doctor_Time=('Doctor Time', 'mean'),
         Patients=('ID', 'count')
-    ).sort_values(by='Avg_Doctor_Time', ascending=False)
-    st.dataframe(doc_stats)
+    )
+    doc_stats['Avg_Doctor_Time'] = doc_stats['Avg_Doctor_Time'].round(1)
+
+doc_stats = doc_stats.sort_values(by='Avg_Doctor_Time', ascending=False)
+st.dataframe(doc_stats)
 
 st.header("Bottleneck Analysis")
 bottlenecks = {
@@ -57,14 +60,27 @@ st.header("Flow Metrics")
 total = len(df)
 both_triage = df[['Triage Start', 'Triage End']].dropna().shape[0]
 st.metric("Triage Path Coverage", f"{both_triage / total:.0%}")
+# Add footnote explanation
+st.caption("Percentage of patients that went through triage.")
 st.metric("Avg Time from Arrival to Room (min)", f"{df['Arrival to Room'].mean():.1f}")
 
 st.header("Visit Mix")
-visit_mix = df['Visit Type'].value_counts(normalize=True)
+visit_mix = df['Visit Type'].value_counts(normalize=True) * 100
+visit_mix = visit_mix.round(1)
+
 st.bar_chart(visit_mix)
+st.caption("FP - Follow-up Patient, NP - New Patient")
 
 st.header("Visit Duration by Category")
-st.dataframe(df.groupby('Visit Category')['Total Visit Duration'].mean().sort_values(ascending=False))
+
+visit_duration_by_cat = (
+    df.groupby('Visit Category')['Total Visit Duration']
+    .mean()
+    .round(1)
+    .sort_values(ascending=False)
+)
+
+st.dataframe(visit_duration_by_cat)
 
 st.header("Visit Category Distribution")
 cat_dist = df['Visit Category'].value_counts()
