@@ -3,3 +3,6 @@ St-gsheets-connection
 matplotlib
 datetime
 pytz
+python-dateutil
+numpy
+pandas
