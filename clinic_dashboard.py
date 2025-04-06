@@ -188,7 +188,7 @@ if len(monthly_mix) >= 2:
     delta_df = pd.DataFrame({
     prev_label: prev_month.astype(int),
     last_label: last_month.astype(int),
-    '% Change': delta.apply(lambda x: f"{x:+.1%}" if pd.notna(x) else "+∞%")
+    '% Change': delta.apply(lambda x: f"{x:+.1%}")
     }).sort_values(by='% Change', ascending=False).sort_values(by='% Change', ascending=False)
 
     st.dataframe(delta_df)
