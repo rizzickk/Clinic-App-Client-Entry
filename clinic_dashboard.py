@@ -37,12 +37,25 @@ st.metric("Avg Doctor Time (min)", f"{df['Doctor Time'].mean():.1f}")
 
 if 'Staff' in df.columns:
     st.header("Doctor-level Metrics")
-    doc_df = df.dropna(subset=['Doctor Time', 'Staff'])
-    doc_stats = doc_df.groupby('Staff').agg(
-        Avg_Doctor_Time=('Doctor Time', 'mean'),
-        Patients=('ID', 'count')
-    )
-    doc_stats['Avg_Doctor_Time'] = doc_stats['Avg_Doctor_Time'].round(1)
+    st.header("Doctor-level Metrics")
+
+    # Step 1: All patients with a staff assigned
+    doctor_assignments = df[df['Staff'].notna()]
+
+    # Step 2: Doctor time values for average calculation
+    doctor_time_data = df[df['Doctor Time'].notna() & df['Staff'].notna()]
+
+    # Step 3: Aggregate
+    avg_time = doctor_time_data.groupby('Staff')['Doctor Time'].mean()
+    patient_counts = doctor_assignments.groupby('Staff')['ID'].count()
+
+    # Step 4: Merge both into a single DataFrame
+    doc_stats = pd.DataFrame({
+        'Avg Doctor Time (min)': avg_time.round(1),
+        'Patient Count': patient_counts
+    }).fillna(0).sort_values(by='Patient Count', ascending=False)
+
+    st.dataframe(doc_stats)
 
 doc_stats = doc_stats.sort_values(by='Avg_Doctor_Time', ascending=False)
 st.dataframe(doc_stats)
@@ -176,3 +189,4 @@ if len(monthly_mix) >= 2:
     st.caption("Month-over-month change in visit category mix.")
 else:
     st.info("Not enough monthly data to compare trends.")
+    st.caption("* Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
