@@ -106,9 +106,11 @@ import altair as alt
 st.header("Visit Category Distribution")
 
 # Clean and sort
+excluded = ['other', 'hypertension', 'diabetes']
+
 cat_dist = (
     df['Visit Category']
-    .loc[df['Visit Category'].str.lower() != 'other']
+    .loc[~df['Visit Category'].str.lower().isin(excluded)]
     .value_counts()
     .sort_values(ascending=False)
     .reset_index()
@@ -154,8 +156,8 @@ filtered_df = df[df['Visit Category'].str.lower() != 'other']
 # Ensure datetime format
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 
-# Exclude 'Other' categories
-filtered_df = df[df['Visit Category'].str.lower() != 'other'].copy()
+excluded = ['other', 'hypertension', 'diabetes']
+filtered_df = df[~df['Visit Category'].str.lower().isin(excluded)].copy()
 
 # Create a 'Month' column using first day of the month
 filtered_df['Month'] = filtered_df['Date'].dt.to_period('M').apply(lambda r: r.start_time)
