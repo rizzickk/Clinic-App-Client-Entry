@@ -14,7 +14,7 @@ import numpy as np
 @st.cache_data
 
 def load_data():
-    df = pd.read_csv("/Users/rizic/Downloads/Cleaned_clinic_data_with_Valid_Durations.csv", parse_dates=[
+    df = pd.read_csv("Cleaned_clinic_data_with_Valid_Durations.csv", parse_dates=[
         'Registration Start', 'Time Out', 'Doctor In', 'Doctor Out',
         'Triage Start', 'Triage End', 'Lab Start', 'Lab End',
         'SW Start', 'SW End', 'Time Roomed'])
