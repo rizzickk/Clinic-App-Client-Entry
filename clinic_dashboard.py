@@ -31,6 +31,16 @@ df = load_data()
 
 st.title("Clinic Operational Metrics Dashboard")
 
+# Ensure 'Date' is datetime
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+
+# Calculate min and max date
+min_date = df['Date'].min().strftime('%B %d, %Y')
+max_date = df['Date'].max().strftime('%B %d, %Y')
+
+# Display as caption
+st.caption(f"📅 Data covers visits from **{min_date}** to **{max_date}**.")
+
 st.header("Overall Visit Metrics")
 st.metric("Avg Total Visit Duration (min)", f"{df['Total Visit Duration'].mean():.1f}")
 st.metric("Avg Doctor Time (min)", f"{df['Doctor Time'].mean():.1f}")
