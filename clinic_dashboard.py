@@ -83,8 +83,16 @@ visit_duration_by_cat = (
 st.dataframe(visit_duration_by_cat)
 
 st.header("Visit Category Distribution")
-cat_dist = df['Visit Category'].value_counts()
+
+cat_dist = (
+    df['Visit Category']
+    .loc[df['Visit Category'].str.lower() != 'other']  # remove 'other' case-insensitively
+    .value_counts()
+    .sort_values(ascending=False)
+)
+
 st.bar_chart(cat_dist)
+st.caption("Visit categories sorted from most to least frequent (excluding 'Other').")
 
 st.header("Top 5 Visit Categories")
 st.write(cat_dist.head(5))
