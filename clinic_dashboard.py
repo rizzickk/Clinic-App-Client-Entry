@@ -178,7 +178,7 @@ if len(monthly_mix) >= 2:
     prev_month = prev_month[mask]
 
     # Compute % change with divide-by-zero handling
-    delta = ((last_month - prev_month) / prev_month.replace(0, np.nan))
+    delta = ((last_month - prev_month) / prev_month.replace(0, 1))
 
 # Extract actual month names
     prev_label = prev_month.name.strftime("%B %Y")   # e.g., "February 2025"
@@ -193,7 +193,7 @@ if len(monthly_mix) >= 2:
 
     st.dataframe(delta_df)
     st.caption("Month-over-month change in visit category mix.")
-    st.caption("* Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
+    st.caption("--warning-- Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
 else:
     st.info("Not enough monthly data to compare trends.")
-    st.caption("* Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
+    st.caption(" --warning-- Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
