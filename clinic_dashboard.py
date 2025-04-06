@@ -35,29 +35,25 @@ st.header("Overall Visit Metrics")
 st.metric("Avg Total Visit Duration (min)", f"{df['Total Visit Duration'].mean():.1f}")
 st.metric("Avg Doctor Time (min)", f"{df['Doctor Time'].mean():.1f}")
 
-if 'Staff' in df.columns:
-    st.header("Doctor-level Metrics")
-    st.header("Doctor-level Metrics")
 
-    # Step 1: All patients with a staff assigned
-    doctor_assignments = df[df['Staff'].notna()]
+st.header("Doctor-level Metrics")
 
-    # Step 2: Doctor time values for average calculation
-    doctor_time_data = df[df['Doctor Time'].notna() & df['Staff'].notna()]
+# Step 1: All patients with a staff assigned
+doctor_assignments = df[df['Staff'].notna()]
 
-    # Step 3: Aggregate
-    avg_time = doctor_time_data.groupby('Staff')['Doctor Time'].mean()
-    patient_counts = doctor_assignments.groupby('Staff')['ID'].count()
+# Step 2: Doctor time values for average calculation
+doctor_time_data = df[df['Doctor Time'].notna() & df['Staff'].notna()]
 
-    # Step 4: Merge both into a single DataFrame
-    doc_stats = pd.DataFrame({
-        'Avg Doctor Time (min)': avg_time.round(1),
-        'Patient Count': patient_counts
-    }).fillna(0).sort_values(by='Patient Count', ascending=False)
+# Step 3: Aggregate
+avg_time = doctor_time_data.groupby('Staff')['Doctor Time'].mean()
+patient_counts = doctor_assignments.groupby('Staff')['ID'].count()
 
-    st.dataframe(doc_stats)
+# Step 4: Merge both into a single DataFrame
+doc_stats = pd.DataFrame({
+    'Avg Doctor Time (min)': avg_time.round(1),
+    'Patient Count': patient_counts
+}).fillna(0).sort_values(by='Patient Count', ascending=False)
 
-doc_stats = doc_stats.sort_values(by='Avg_Doctor_Time', ascending=False)
 st.dataframe(doc_stats)
 
 st.header("Bottleneck Analysis")
