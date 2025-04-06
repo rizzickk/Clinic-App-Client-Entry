@@ -82,16 +82,31 @@ visit_duration_by_cat = (
 
 st.dataframe(visit_duration_by_cat)
 
+import altair as alt
+
 st.header("Visit Category Distribution")
 
+# Clean and sort
 cat_dist = (
     df['Visit Category']
-    .loc[df['Visit Category'].str.lower() != 'other']  # remove 'other' case-insensitively
+    .loc[df['Visit Category'].str.lower() != 'other']
     .value_counts()
     .sort_values(ascending=False)
+    .reset_index()
 )
 
-st.bar_chart(cat_dist)
+cat_dist.columns = ['Visit Category', 'Count']
+
+# Altair bar chart with custom x-axis order
+bar = alt.Chart(cat_dist).mark_bar().encode(
+    x=alt.X('Visit Category', sort='-y'),  # Sort by count descending
+    y='Count'
+).properties(
+    width=700,
+    height=400
+)
+
+st.altair_chart(bar, use_container_width=True)
 st.caption("Visit categories sorted from most to least frequent (excluding 'Other').")
 
 st.header("Top 5 Visit Categories")
