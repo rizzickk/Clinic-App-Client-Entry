@@ -188,11 +188,12 @@ if len(monthly_mix) >= 2:
     delta_df = pd.DataFrame({
     prev_label: prev_month.astype(int),
     last_label: last_month.astype(int),
-    '% Change': delta.apply(lambda x: f"{x:+.1%}")
+    '% Change': delta.apply(lambda x: f"{x:+.1%}" if pd.notna(x) else "+∞%")
     }).sort_values(by='% Change', ascending=False).sort_values(by='% Change', ascending=False)
 
     st.dataframe(delta_df)
     st.caption("Month-over-month change in visit category mix.")
+    st.caption("* Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
 else:
     st.info("Not enough monthly data to compare trends.")
     st.caption("* Some values may be missing due to user entry issues. The clinic gets busy and cannot always track every input.")
