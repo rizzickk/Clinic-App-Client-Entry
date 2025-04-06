@@ -110,18 +110,35 @@ st.altair_chart(bar, use_container_width=True)
 
 
 st.header("Top 5 Visit Categories")
-st.write(cat_dist.head(5), index = False)
+st.write(cat_dist.head(5))
 
 st.header("Weekly Visit Mix Change")
-# Correct way to set the weekly periods
-# Explicit datetime conversion
+
+# Ensure 'Date' is datetime
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-df['Week'] = df['Date'].dt.to_period('W').apply(lambda r: r.start_time)
 
-weekly_mix = df.groupby(['Week', 'Visit Category']).size().unstack().fillna(0)
+# Remove 'Other' visit categories (case-insensitive)
+filtered_df = df[df['Visit Category'].str.lower() != 'other']
 
+# Convert to weekly period start date
+filtered_df['Week'] = filtered_df['Date'].dt.to_period('W').apply(lambda r: r.start_time)
+
+# Weekly mix: number of visits per category, per week
+weekly_mix = (
+    filtered_df.groupby(['Week', 'Visit Category'])
+    .size()
+    .unstack()
+    .fillna(0)
+)
+
+# Compare most recent week to prior week
 if len(weekly_mix) >= 2:
     last_week = weekly_mix.iloc[-1]
     prev_week = weekly_mix.iloc[-2]
     delta = (last_week - prev_week) / prev_week.replace(0, np.nan)
-    st.dataframe(delta.dropna().sort_values(ascending=False).apply(lambda x: f"{x:+.1%}"))
+
+    st.dataframe(
+        delta.dropna()
+        .sort_values(ascending=False)
+        .apply(lambda x: f"{x:+.1%}")
+    )
