@@ -71,7 +71,7 @@ visit_mix = visit_mix.round(1)
 st.bar_chart(visit_mix)
 st.caption("FP - Follow-up Patient, NP - New Patient")
 
-st.header("Visit Duration by Category")
+st.header("Visit Duration by Category (min)")
 
 visit_duration_by_cat = (
     df.groupby('Visit Category')['Total Visit Duration']
@@ -83,8 +83,16 @@ visit_duration_by_cat = (
 st.dataframe(visit_duration_by_cat)
 
 st.header("Visit Category Distribution")
-cat_dist = df['Visit Category'].value_counts()
+
+cat_dist = (
+    df['Visit Category']
+    .loc[df['Visit Category'].str.lower() != 'other']  # remove 'other' case-insensitively
+    .value_counts()
+    .sort_values(ascending=False)
+)
+
 st.bar_chart(cat_dist)
+st.caption("Visit categories sorted from most to least frequent (excluding 'Other').")
 
 st.header("Top 5 Visit Categories")
 st.write(cat_dist.head(5))
